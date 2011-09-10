@@ -1,0 +1,13 @@
+*.swp
+*.manifest
+*.ilk
+*.exp
+*.map
+*.pdb
+*DEBUG_x*.dll
+*DEBUG_x*.exe
+*DEBUG_x*.lib
+compiler/vc8win32
+compiler/vc8win64
+compiler/vc9win32
+compiler/vc9win64

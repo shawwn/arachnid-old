@@ -1,0 +1,319 @@
+<XPJ version="4">
+	<Project name="arachnid" version="1">
+		<Export platform="win32" tool="vc9">../vc9win32</Export>
+		<Export platform="win32" tool="vc8">../vc8win32</Export>
+		<Export platform="win64" tool="vc9">../vc9win64</Export>
+		<Export platform="win64" tool="vc8">../vc8win64</Export>
+
+		<!-- ===================================== -->
+		<!-- = common                              -->
+		<!-- ===================================== -->
+		<Target name="common">
+			<Export platform="win32" tool="vc9">../vc9win32</Export>
+			<Export platform="win32" tool="vc8">../vc8win32</Export>
+			<Export platform="win64" tool="vc9">../vc9win64</Export>
+			<Export platform="win64" tool="vc8">../vc8win64</Export>
+			<Configuration name="default" type="lib">
+				<Preprocessor type="define">
+					WIN32
+					_WINDOWS
+					_CRT_SECURE_NO_DEPRECATE
+					UNICODE=1
+				</Preprocessor>
+				<CFlags tool="vc8">/wd4996 /wd4505</CFlags>
+				<SearchPaths type="header">
+					../../src
+					../../ext
+				</SearchPaths>
+
+				<Files name="common" root="../../src/common" type="source">
+					*.hpp
+					*.cpp
+					*.h
+					*.c
+				</Files>
+				<PrecompiledHeader>common_afx.h</PrecompiledHeader>
+			</Configuration>
+
+			<Configuration name="debug" platform="win32">
+				<OutDir>../../lib/win32</OutDir>
+				<OutFile>commonDEBUG_x86</OutFile>
+				<CFlags>/fp:fast /W4 /WX /MDd /Zi</CFlags>
+				<Preprocessor type="define">
+					_DEBUG
+				</Preprocessor>
+			</Configuration>
+			<Configuration name="debug" platform="win64">
+				<OutDir>../../lib/win64</OutDir>
+				<OutFile>commonDEBUG_x64</OutFile>
+				<CFlags>/fp:fast /W4 /WX /MDd /Zi</CFlags>
+				<Preprocessor type="define">
+					_DEBUG
+				</Preprocessor>
+			</Configuration>
+
+			<Configuration name="release" platform="win32">
+				<OutDir>../../lib/win32</OutDir>
+				<OutFile>common_x86</OutFile>
+				<CFlags>/fp:fast /WX /W4 /MD /Zi /O2</CFlags>
+				<Preprocessor type="define">NDEBUG</Preprocessor>
+			</Configuration>
+
+			<Configuration name="release" platform="win64">
+				<OutDir>../../lib/win64</OutDir>
+				<OutFile>common_x64</OutFile>
+				<CFlags>/fp:fast /WX /W4 /MD /Zi /O2</CFlags>
+				<Preprocessor type="define">NDEBUG</Preprocessor>
+			</Configuration>
+
+			<Dependencies>
+			</Dependencies>
+		</Target>
+
+		<!-- ===================================== -->
+		<!-- = graphics                            -->
+		<!-- ===================================== -->
+		<Target name="graphics">
+			<Export platform="win32" tool="vc9">../vc9win32</Export>
+			<Export platform="win32" tool="vc8">../vc8win32</Export>
+			<Export platform="win64" tool="vc9">../vc9win64</Export>
+			<Export platform="win64" tool="vc8">../vc8win64</Export>
+			<Configuration name="default" type="lib">
+				<Preprocessor type="define">
+					WIN32
+					_WINDOWS
+					_CRT_SECURE_NO_DEPRECATE
+					UNICODE=1
+				</Preprocessor>
+				<CFlags tool="vc8">/wd4996 /wd4505</CFlags>
+				<SearchPaths type="header">
+					../../src
+					../../ext
+					../../ext/freeimage/include
+					../../ext/freeglut/include
+					../../ext/anttweakbar/include
+				</SearchPaths>
+
+				<Files name="graphics" root="../../src/graphics" type="source">
+					*.hpp
+					*.cpp
+					*.h
+					*.c
+				</Files>
+				<PrecompiledHeader>graphics_afx.h</PrecompiledHeader>
+			</Configuration>
+
+			<Configuration name="debug" platform="win32">
+				<OutDir>../../lib/win32</OutDir>
+				<OutFile>graphicsDEBUG_x86</OutFile>
+				<CFlags>/fp:fast /W4 /WX /MDd /Zi</CFlags>
+				<Preprocessor type="define">
+					_DEBUG
+				</Preprocessor>
+			</Configuration>
+			<Configuration name="debug" platform="win64">
+				<OutDir>../../lib/win64</OutDir>
+				<OutFile>graphicsDEBUG_x64</OutFile>
+				<CFlags>/fp:fast /W4 /WX /MDd /Zi</CFlags>
+				<Preprocessor type="define">
+					_DEBUG
+				</Preprocessor>
+			</Configuration>
+
+			<Configuration name="release" platform="win32">
+				<OutDir>../../lib/win32</OutDir>
+				<OutFile>graphics_x86</OutFile>
+				<CFlags>/fp:fast /WX /W4 /MD /Zi /O2</CFlags>
+				<Preprocessor type="define">NDEBUG</Preprocessor>
+			</Configuration>
+
+			<Configuration name="release" platform="win64">
+				<OutDir>../../lib/win64</OutDir>
+				<OutFile>graphics_x64</OutFile>
+				<CFlags>/fp:fast /WX /W4 /MD /Zi /O2</CFlags>
+				<Preprocessor type="define">NDEBUG</Preprocessor>
+			</Configuration>
+
+			<Dependencies>
+				common
+			</Dependencies>
+		</Target>
+
+		<!-- ===================================== -->
+		<!-- = engine                              -->
+		<!-- ===================================== -->
+		<Target name="engine">
+			<Export platform="win32" tool="vc9">../vc9win32</Export>
+			<Export platform="win32" tool="vc8">../vc8win32</Export>
+			<Export platform="win64" tool="vc9">../vc9win64</Export>
+			<Export platform="win64" tool="vc8">../vc8win64</Export>
+			<Configuration name="default" type="dll">
+				<Preprocessor type="define">
+					WIN32
+					_WINDOWS
+					_CRT_SECURE_NO_DEPRECATE
+					UNICODE=1
+					ENGINE_EXPORTS
+				</Preprocessor>
+				<CFlags tool="vc8">/wd4996 /wd4505</CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<SearchPaths type="header">
+					../../src
+					../../ext
+				</SearchPaths>
+
+				<Files name="engine" root="../../src/engine" type="source">
+					*.hpp
+					*.cpp
+					*.h
+					*.c
+				</Files>
+				<PrecompiledHeader>engine_afx.h</PrecompiledHeader>
+
+				<SearchPaths type="library">
+					../../ext/freeimage/lib
+					../../ext/freeglut/lib
+					../../ext/anttweakbar/lib
+				</SearchPaths>
+				<Libraries>
+					winmm.lib
+					dbghelp.lib
+					winmm.lib
+					comctl32.lib
+					shlwapi.lib
+
+					freeimage.lib
+					freeglut.lib
+				</Libraries>
+				<Libraries platform="win32">
+					anttweakbar.lib
+				</Libraries>
+				<Libraries platform="win64">
+					anttweakbar64.lib
+				</Libraries>
+			</Configuration>
+
+			<Configuration name="debug" platform="win32">
+				<OutDir>../../bin/win32</OutDir>
+				<OutFile>engineDEBUG_x86</OutFile>
+				<CFlags>/fp:fast /W4 /WX /MDd /Zi</CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<Preprocessor type="define">
+					_DEBUG
+				</Preprocessor>
+			</Configuration>
+			<Configuration name="debug" platform="win64">
+				<OutDir>../../bin/win64</OutDir>
+				<OutFile>engineDEBUG_x64</OutFile>
+				<CFlags>/fp:fast /W4 /WX /MDd /Zi</CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<Preprocessor type="define">
+					_DEBUG
+				</Preprocessor>
+			</Configuration>
+
+			<Configuration name="release" platform="win32">
+				<OutDir>../../bin/win32</OutDir>
+				<OutFile>engine_x86</OutFile>
+				<CFlags>/fp:fast /WX /W4 /MD /Zi /O2</CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<Preprocessor type="define">NDEBUG</Preprocessor>
+			</Configuration>
+
+			<Configuration name="release" platform="win64">
+				<OutDir>../../bin/win64</OutDir>
+				<OutFile>engine_x64</OutFile>
+				<CFlags>/fp:fast /WX /W4 /MD /Zi /O2</CFlags>
+				<Preprocessor type="define">NDEBUG</Preprocessor>
+			</Configuration>
+
+			<Dependencies type="link">
+				common
+				graphics
+			</Dependencies>
+		</Target>
+
+		<!-- ===================================== -->
+		<!-- = arachnid                            -->
+		<!-- ===================================== -->
+		<Target name="arachnid">
+			<Export platform="win32" tool="vc9">../vc9win32</Export>
+			<Export platform="win32" tool="vc8">../vc8win32</Export>
+			<Export platform="win64" tool="vc9">../vc9win64</Export>
+			<Export platform="win64" tool="vc8">../vc8win64</Export>
+			<PostBuildEvent>editbin /SUBSYSTEM:CONSOLE "$(TargetPath)"</PostBuildEvent>
+			<Configuration name="default" type="exe">
+				<Preprocessor type="define">
+					WIN32
+					_WINDOWS
+					_CRT_SECURE_NO_DEPRECATE
+					UNICODE=1
+				</Preprocessor>
+				<CFlags tool="vc8">/wd4996 /wd4505</CFlags>
+				<SearchPaths type="header">
+					../../src
+					../../ext
+					../../ext/freeimage/include
+					../../ext/freeglut/include
+					../../ext/anttweakbar/include
+				</SearchPaths>
+
+				<Files name="arachnid" root="../../app/arachnid" type="source">
+					*.cpp
+					*.h
+				</Files>
+
+				<Files name="arachnid" root="../../app/arachnid/win" type="source" platform="win32">
+					*.cpp
+					*.h
+				</Files>
+
+				<SearchPaths type="library">
+				</SearchPaths>
+				<Libraries>
+				</Libraries>
+			</Configuration>
+
+			<Configuration name="debug" platform="win32">
+				<OutDir>../../bin/win32</OutDir>
+				<OutFile>arachnidDEBUG_x86</OutFile>
+				<CFlags>/fp:fast /W4 /WX /MDd /Zi</CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<Preprocessor type="define">
+					_DEBUG
+				</Preprocessor>
+			</Configuration>
+			<Configuration name="debug" platform="win64">
+				<OutDir>../../bin/win64</OutDir>
+				<OutFile>arachnidDEBUG_x64</OutFile>
+				<CFlags>/fp:fast /W4 /WX /MDd /Zi</CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<Preprocessor type="define">
+					_DEBUG
+				</Preprocessor>
+			</Configuration>
+
+			<Configuration name="release" platform="win32">
+				<OutDir>../../bin/win32</OutDir>
+				<OutFile>arachnid_x86</OutFile>
+				<CFlags>/fp:fast /WX /W4 /MD /Zi /O2</CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<Preprocessor type="define">NDEBUG</Preprocessor>
+			</Configuration>
+
+			<Configuration name="release" platform="win64">
+				<OutDir>../../bin/win64</OutDir>
+				<OutFile>arachnid_x64</OutFile>
+				<CFlags>/fp:fast /WX /W4 /MD /Zi /O2</CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<Preprocessor type="define">NDEBUG</Preprocessor>
+			</Configuration>
+
+			<Dependencies type="link">
+				common
+				engine
+				graphics
+			</Dependencies>
+		</Target>
+	</Project>
+</XPJ>
