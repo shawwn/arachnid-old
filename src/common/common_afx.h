@@ -11,5 +11,5 @@
 #include "common/c_memmanager.h"
 
 // precompile STL.
-#include "common/c_string.h"
 #include "common/c_stl.h"
+#include "common/c_string.h"

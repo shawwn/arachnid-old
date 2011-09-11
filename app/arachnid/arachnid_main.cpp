@@ -8,6 +8,11 @@
 // standard C headers.
 #include <cstdio>
 
+// engine headers.
+#include "engine/engine_afx.h"
+#include "engine/c_system.h"
+#include "engine/c_engine.h"
+
 
 //===========================================================================
 // Application entry point.
@@ -16,8 +21,11 @@
 //---------------------------------------------------------------------------
 int	App_Main( int argc, char** argv )
 {
-	argc = argc;
-	argv = argv;
+	System.Init( argc, argv );
+
+	if ( !Engine.Startup() )
+		return 0;
+
 	printf("hello\n");
 	return 0;
 }

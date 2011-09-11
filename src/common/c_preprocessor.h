@@ -212,9 +212,11 @@ General defines
 */
 
 // static assert
-#define E_JOIN_HELPER(X, Y) X##Y
-#define E_JOIN(X, Y, Z) E_JOIN_HELPER(X, Y##Z)
-#define E_COMPILE_TIME_ASSERT(exp)	typedef char E_JOIN( ECompileTimeAssert, __FILE__ , __COUNTER__ )[(exp) ? 1 : -1]
+#define PP_JOIN_HELPER(X, Y)		X##Y
+#define PP_JOIN(X, Y, Z)			PP_JOIN_HELPER(X, Y##Z)
+#define PP_EVAL2(X)					X
+#define PP_EVAL(X)					PP_EVAL2(X)
+#define E_COMPILE_TIME_ASSERT(exp)	typedef char PP_JOIN( ECompileTimeAssert, __FILE__ , __COUNTER__ )[(exp) ? 1 : -1]
 
 #ifdef E_GNUC
 #define E_OFFSET_OF(X, Y) __builtin_offsetof(X, Y)
