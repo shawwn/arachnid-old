@@ -8,6 +8,7 @@
 #include <mmsystem.h>
 #include <shlwapi.h>
 #include <direct.h>
+#include <time.h>
 #pragma comment( lib, "winmm.lib" )
 
 // engine headers.
@@ -67,17 +68,28 @@ class CSystem_impl
 public:
 	CSystem_impl();
 
+	// DLL management state.
 	PathToLibMap		mapPathToLib;
 	LibToPathMap		mapLibToPath;
+
+	// the filepath to the root dir, such as:  "c:/Program Files/arachid/"
 	string				sAbsolutePathToRootDir;
+
+	// a list of callbacks to invoke when System.Exit() is called.
 	OnExitCallbackList	vOnExitCallbacks;
+
+	// clock/timing state.
+	PxU32				uiAppStartTime;
+
+	// flags.
 	bool				bInitialized;
 	bool				bExiting;
 };
 
 //---------------------------------------------------------------------------
 CSystem_impl::CSystem_impl()
-: bInitialized( false )
+: uiAppStartTime( 0 )
+, bInitialized( false )
 , bExiting( false )
 {
 }
@@ -109,6 +121,13 @@ CSystem::Init( int argc, char** argv )
 	if ( m.bInitialized )
 		return;
 	m.bInitialized = true;
+
+	// seed RNG.
+	srand( (unsigned int)time(NULL) );
+
+	// begin high precision timing, and record our application's start time.
+	timeBeginPeriod(1);
+	m.uiAppStartTime = timeGetTime();
 
 	// switch the working directory to our exe's dir.
 	Sys_ChangeToExeDir();
@@ -147,6 +166,12 @@ CSystem::Exit( int iCode /*= 0 */ )
 		E_ASSERT( pCallback );
 		if ( pCallback )
 			pCallback( pUserdata );
+	}
+
+	// pre-shutdown phase...
+	{
+		// end high precision timing.
+		timeEndPeriod(1);
 	}
 
 	// now exit.
@@ -274,6 +299,19 @@ CSystem::GetProcAddr( void* hLib, const char* sFuncName )
 	void* pResult = ::GetProcAddress( (HMODULE)hLib, sFuncName );
 	return pResult;
 }
+
+//---------------------------------------------------------------------------
+PxU32
+CSystem::GetCurTime()
+{
+	E_ASSERT( m.uiAppStartTime > 0 );
+	if ( m.uiAppStartTime <= 0 )
+		return 0;
+
+	PxU32 uiElaspedTime( timeGetTime() - m.uiAppStartTime );
+	return uiElaspedTime;
+}
+
 
 //===========================================================================
 // Global static initialization.

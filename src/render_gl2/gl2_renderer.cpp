@@ -128,5 +128,6 @@ void
 CGL2Renderer::Frame( PxU32 uiTotalTime, PxF32 fDeltaTime )
 {
 	E_UNREF_PARAM2( uiTotalTime, fDeltaTime );
+	printf( "clock: %d\t\tdt: %f\n", uiTotalTime, fDeltaTime );
 	glutMainLoopEvent();
 }

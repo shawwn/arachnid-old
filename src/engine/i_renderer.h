@@ -10,9 +10,11 @@ protected:
 public:
 	IRenderer()				{ }
 
+	virtual const char*		GetName() =0;
+
 	virtual void			Shutdown() =0;
 
-	virtual const char*		GetName() =0;
+	virtual void			Frame( PxU32 uiTotalTime, PxF32 fDeltaTime ) =0;
 
 	virtual void			RegisterTexture( ResHandle hTex )		{	E_UNREF_PARAM( hTex );	}
 	virtual void			UnregisterTexture( ResHandle hTex )		{	E_UNREF_PARAM( hTex );	}

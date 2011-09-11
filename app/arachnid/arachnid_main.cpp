@@ -25,22 +25,27 @@ void App_OnExit( void* pUserdata );
 //---------------------------------------------------------------------------
 int	App_Main( int argc, char** argv )
 {
+	// initialize the system.
 	System.Init( argc, argv );
 	System.NotifyOnExit( App_OnExit );
-	System.NotifyOnExit( App_OnExit );
 
+	// initialize the engine.
 	if ( !Engine.Startup() )
 		return 0;
 
+	// enter into the main application loop.
+	while ( Engine.Frame() )
+	{
+	}
+
+	// graceefully exit the application.
 	System.Exit();
 	return 0;
 }
 
 //---------------------------------------------------------------------------
-void	App_OnExit( void* pUserdata )
+void	App_OnExit( void* /*pUserdata*/ )
 {
-	E_UNREF_PARAM( pUserdata );
-
 	// shutdown the engine.
 	Engine.Shutdown();
 }

@@ -16,6 +16,7 @@ public:
 
 	bool		Startup();
 	void		Shutdown();
+	bool		Frame();
 
 private:
 	// implementation is hidden from the header file, to avoid excessive recompilation.

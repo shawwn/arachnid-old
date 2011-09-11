@@ -1,6 +1,7 @@
 #include "engine_afx.h"
 #include "c_engine.h"
 
+#include "engine/c_system.h"
 #include "engine/c_filemanager.h"
 #include "engine/i_renderer.h"
 
@@ -18,22 +19,25 @@ typedef map<string, IRenderer*>		RendererByNameMap;
 class CEngine_impl
 {
 public:
-	~CEngine_impl();
 	CEngine_impl();
 
+	// renderer state.
 	FilepathRendererDLLMap		mapRendererDLLs;
 	RendererByNameMap			mapRenderers;
+
+	// timing/clock state.
+	PxU32						uiFullyLoadedAtTime;
+	PxU32						uiPrevTime;
+
+	// flags.
 	bool						bInitialized;
 };
 
 //---------------------------------------------------------------------------
-CEngine_impl::~CEngine_impl()
-{
-}
-
-//---------------------------------------------------------------------------
 CEngine_impl::CEngine_impl()
 : bInitialized( false )
+, uiFullyLoadedAtTime( 0 )
+, uiPrevTime( 0 )
 {
 }
 
@@ -174,4 +178,40 @@ CEngine::Shutdown()
 		UnloadRendererDLL( cRenderer );
 		m.mapRendererDLLs.erase( it );
 	}
+}
+
+//---------------------------------------------------------------------------
+bool
+CEngine::Frame()
+{
+	if ( !m.bInitialized )
+		return false;
+
+	if ( m.uiFullyLoadedAtTime <= 0 )
+		m.uiFullyLoadedAtTime = System.GetCurTime();
+
+	// update clocks / calculate time delta.
+	PxU32 uiCurTime = System.GetCurTime();
+	PxU32 uiTotalTime( m.uiFullyLoadedAtTime - uiCurTime );
+	PxU32 uiDeltaTime = ( (m.uiPrevTime == 0) ? 0 : (uiCurTime - m.uiPrevTime) );
+	PxF32 fDeltaTime = ( uiDeltaTime / 1000.0F );
+	m.uiPrevTime = uiCurTime;
+
+	// update our renderers.
+	for ( RendererByNameMap::iterator it(m.mapRenderers.begin()), itEnd(m.mapRenderers.end());
+		it != itEnd;
+		++it )
+	{
+		const string& sRendererName( it->first );
+		IRenderer* pRenderer( it->second );
+		E_UNREF_PARAM2( sRendererName, pRenderer );
+
+		E_ASSERT( pRenderer != NULL );
+		if ( pRenderer )
+		{
+			pRenderer->Frame( uiTotalTime, fDeltaTime );
+		}
+	}
+
+	return m.bInitialized;
 }
