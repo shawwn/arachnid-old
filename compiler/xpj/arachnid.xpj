@@ -180,7 +180,6 @@
 
 				<SearchPaths type="library">
 					../../ext/freeimage/lib
-					../../ext/freeglut/lib
 					../../ext/anttweakbar/lib
 				</SearchPaths>
 				<Libraries>
@@ -191,7 +190,6 @@
 					shlwapi.lib
 
 					freeimage.lib
-					freeglut.lib
 				</Libraries>
 				<Libraries platform="win32">
 					anttweakbar.lib
@@ -262,6 +260,9 @@
 				<SearchPaths type="header">
 					../../src
 					../../ext
+					../../ext/freeimage/include
+					../../ext/freeglut/include
+					../../ext/anttweakbar/include
 				</SearchPaths>
 
 				<Files name="render_gl2" root="../../src/render_gl2" type="source">
@@ -285,12 +286,13 @@
 					shlwapi.lib
 
 					freeimage.lib
-					freeglut.lib
 				</Libraries>
 				<Libraries platform="win32">
+					freeglut.lib
 					anttweakbar.lib
 				</Libraries>
 				<Libraries platform="win64">
+					freeglut_x64.lib
 					anttweakbar64.lib
 				</Libraries>
 			</Configuration>

@@ -87,7 +87,7 @@ struct SRendererDLL
 	const char*		(*GetEngineVersion)();
 	PxU32			(*GetRendererCount)();
 	const char*		(*GetRendererName)( PxU32 idx );
-	IRenderer*		(*CreateRenderer)( const char* sRendererName );
+	IRenderer*		(*CreateRenderer)( const char* sRendererName, PxU32 uiResW, PxU32 uiResH );
 	void			(*ReleaseRenderer)( IRenderer* pRenderer );
 
 	void*			hDLL;

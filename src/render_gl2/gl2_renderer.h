@@ -5,6 +5,8 @@
 //***************************************************************************
 #include "engine/i_renderer.h"
 
+class CGL2Renderer_impl;
+
 //===========================================================================
 // GL2Renderer
 //===========================================================================
@@ -14,6 +16,13 @@ public:
 	~CGL2Renderer();
 	CGL2Renderer();
 
-	virtual void			Shutdown();
 	virtual const char*		GetName()		{	return "gl2";	}
+
+	bool					Startup( PxU32 uiResolutionW, PxU32 uiResolutionH );
+	virtual void			Shutdown();
+
+	void					Frame( PxU32 uiTotalTime, PxF32 fDeltaTime );
+
+private:
+	E_IMPL_DECL( CGL2Renderer );
 };

@@ -6,6 +6,8 @@
 //***************************************************************************
 class CSystem_impl;
 
+typedef void	(*OnExitCallback)( void* pUserdata );
+
 //===========================================================================
 // System
 //===========================================================================
@@ -17,6 +19,7 @@ public:
 
 	void		Init( int argc, char** argv );
 	void		Exit( int iCode = 0 );
+	void		NotifyOnExit( OnExitCallback pCallback, void* pUserdata = NULL );
 
 	void*		LoadLib( const string& sPath );
 	void*		FindLib( const string& sPath );

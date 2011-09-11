@@ -13,3 +13,6 @@ using std::vector;
 using std::map;
 using std::pair;
 using std::make_pair;
+
+// standard STL algorithms.
+#include <algorithm>

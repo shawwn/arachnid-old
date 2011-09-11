@@ -123,9 +123,16 @@ CEngine::Startup()
 		SRendererDLL& cRenderer( it->second );
 		E_UNREF_PARAM2( sFilepath, cRenderer );
 
-		IRenderer* pRenderer = cRenderer.CreateRenderer( "gl2" );
+		IRenderer* pRenderer = cRenderer.CreateRenderer( "gl2", 1024, 768 );
 		if ( pRenderer != NULL )
 		{
+			const string& sRendererName( pRenderer->GetName() );
+			if ( !m.mapRenderers.insert( make_pair( sRendererName, pRenderer ) ).second )
+			{
+				E_ASSERT( !"Renderer name collision" );
+				cRenderer.ReleaseRenderer( pRenderer );
+				pRenderer = NULL;
+			}
 		}
 	}
 
@@ -145,9 +152,9 @@ CEngine::Shutdown()
 	while ( !m.mapRenderers.empty() )
 	{
 		RendererByNameMap::iterator it( m.mapRenderers.begin() );
-		const string& sFilepath( it->first );
+		const string& sName( it->first );
 		IRenderer* pRenderer( it->second );
-		E_UNREF_PARAM2( sFilepath, pRenderer );
+		E_UNREF_PARAM2( sName, pRenderer );
 
 		E_ASSERT( pRenderer );
 		if ( pRenderer )

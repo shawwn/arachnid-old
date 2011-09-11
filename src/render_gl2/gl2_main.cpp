@@ -10,6 +10,15 @@
 // std C headers.
 #include <cstdio>
 
+//***************************************************************************
+// Globals
+//***************************************************************************
+CGL2Renderer*	g_pCurrentGLRenderer;
+
+//***************************************************************************
+// Definitions
+//***************************************************************************
+
 //---------------------------------------------------------------------------
 // A renderer DLL's R_GlobalStartup() function is always the first function to
 // be called;  and R_GlobalShutdown() is the last to be called.
@@ -63,12 +72,27 @@ R_API const char*	R_GetRendererName( PxU32 idx )
 // Requests a new instance of the specified renderer.
 //---------------------------------------------------------------------------
 extern "C"
-R_API IRenderer*	R_CreateRenderer( PxU32 idx )
+R_API IRenderer*	R_CreateRenderer( const char* sName, PxU32 uiResW, PxU32 uiResH )
 {
-	if ( idx != 0 )
+	if ( !StringEqual(sName, "gl2") )
 		return NULL;
 
-	return E_NEW( CGL2Renderer );
+	// if the renderer has already been created, then fail.  (Only one at a time!)
+	if ( g_pCurrentGLRenderer != NULL )
+		return NULL;
+
+	// allocate the renderer.
+	CGL2Renderer* pRenderer = E_NEW( CGL2Renderer );
+	g_pCurrentGLRenderer = pRenderer;
+
+	// initialize the renderer.
+	if ( !pRenderer->Startup( uiResW, uiResH ) )
+	{
+		E_DELETE( pRenderer );
+		return NULL;
+	}
+
+	return pRenderer;
 }
 
 
@@ -78,6 +102,11 @@ R_API IRenderer*	R_CreateRenderer( PxU32 idx )
 extern "C"
 R_API void	R_ReleaseRenderer( IRenderer* pRenderer )
 {
+	E_ASSERT( pRenderer == g_pCurrentGLRenderer );
+	if ( !pRenderer )
+		return;
+	g_pCurrentGLRenderer = NULL;
+
 	bool bIsSafe = StringEqual("gl2", pRenderer->GetName());
 	E_ASSERT( bIsSafe );
 	if ( bIsSafe )

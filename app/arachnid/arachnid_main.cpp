@@ -13,6 +13,10 @@
 #include "engine/c_system.h"
 #include "engine/c_engine.h"
 
+//***************************************************************************
+// Declarations
+//***************************************************************************
+void App_OnExit( void* pUserdata );
 
 //===========================================================================
 // Application entry point.
@@ -22,14 +26,24 @@
 int	App_Main( int argc, char** argv )
 {
 	System.Init( argc, argv );
+	System.NotifyOnExit( App_OnExit );
+	System.NotifyOnExit( App_OnExit );
 
 	if ( !Engine.Startup() )
 		return 0;
 
-	printf("hello\n");
+	System.Exit();
 	return 0;
 }
 
+//---------------------------------------------------------------------------
+void	App_OnExit( void* pUserdata )
+{
+	E_UNREF_PARAM( pUserdata );
+
+	// shutdown the engine.
+	Engine.Shutdown();
+}
 
 //===========================================================================
 // Platform-specific entry points.

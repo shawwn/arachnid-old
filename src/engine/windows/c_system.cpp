@@ -27,8 +27,9 @@ SINGLETON_INIT( CSystem );
 
 struct SLibInfo;
 
-typedef map<string, SLibInfo>				PathToLibMap;
-typedef map<void*, PathToLibMap::iterator>	LibToPathMap;
+typedef map<string, SLibInfo>					PathToLibMap;
+typedef map<void*, PathToLibMap::iterator>		LibToPathMap;
+typedef vector< pair<OnExitCallback, void*> >	OnExitCallbackList;
 
 //===========================================================================
 // SLibInfo - to track handles to DLLs we've loaded, including refcount.
@@ -69,12 +70,15 @@ public:
 	PathToLibMap		mapPathToLib;
 	LibToPathMap		mapLibToPath;
 	string				sAbsolutePathToRootDir;
+	OnExitCallbackList	vOnExitCallbacks;
 	bool				bInitialized;
+	bool				bExiting;
 };
 
 //---------------------------------------------------------------------------
 CSystem_impl::CSystem_impl()
 : bInitialized( false )
+, bExiting( false )
 {
 }
 
@@ -123,6 +127,47 @@ CSystem::Init( int argc, char** argv )
 			m.sAbsolutePathToRootDir = FileManager.NormalizePath( sExeDir );
 		}
 	}
+}
+
+//---------------------------------------------------------------------------
+void
+CSystem::Exit( int iCode /*= 0 */ )
+{
+	// prevent recursive exiting.
+	if ( m.bExiting )
+		return;
+	m.bExiting = true;
+
+	// notify everyone that we're exiting.
+	for ( PxU32 i = 0; i < (PxU32)m.vOnExitCallbacks.size(); ++i )
+	{
+		OnExitCallback	pCallback = m.vOnExitCallbacks[i].first;
+		void*			pUserdata = m.vOnExitCallbacks[i].second;
+
+		E_ASSERT( pCallback );
+		if ( pCallback )
+			pCallback( pUserdata );
+	}
+
+	// now exit.
+	exit( iCode );
+}
+
+//---------------------------------------------------------------------------
+void
+CSystem::NotifyOnExit( OnExitCallback pCallback, void* pUserdata )
+{
+	if ( !pCallback )
+		return;
+
+	// if the callback is already in the list, then skip it.
+	for ( PxU32 i = 0; i < (PxU32)m.vOnExitCallbacks.size(); ++i )
+	{
+		if ( pCallback == m.vOnExitCallbacks[i].first )
+			return;
+	}
+
+	m.vOnExitCallbacks.push_back( make_pair( pCallback, pUserdata ) );
 }
 
 //---------------------------------------------------------------------------
@@ -201,8 +246,9 @@ CSystem::UnloadLib( void* hLib )
 	}
 
 	// get the DLL info.
-	//const string&	sLibPath( (itFind->second)->first );
+	const string&	sLibPath( (itFind->second)->first );
 	SLibInfo&		cLibInfo( (itFind->second)->second );
+	E_UNREF_PARAM2( sLibPath, cLibInfo );
 
 	// free the library.
 	FreeLibrary( (HMODULE)cLibInfo.hHandle );
