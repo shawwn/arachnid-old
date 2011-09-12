@@ -5,6 +5,13 @@
 #include "engine/c_filemanager.h"
 #include "engine/i_renderer.h"
 
+// graphics headers.
+#include "graphics/gr_camera.h"
+#include "graphics/gr_projection.h"
+
+// math headers.
+#include "common/m_vec3.h"
+
 //***************************************************************************
 // Declarations
 //***************************************************************************
@@ -28,6 +35,9 @@ public:
 	// renderer state.
 	FilepathRendererDLLMap		mapRendererDLLs;
 	RendererByNameMap			mapRenderers;
+
+	// camera state.
+	GrCamera					cCamera;
 
 	// timing/clock state.
 	PxU32						uiFullyLoadedAtTime;
@@ -153,7 +163,7 @@ CEngine::~CEngine()
 
 //---------------------------------------------------------------------------
 bool
-CEngine::Startup()
+CEngine::Startup( PxU32 uiScreenWidth, PxU32 uiScreenHeight )
 {
 	E_ASSERT( !m.bInitialized );
 	if ( m.bInitialized )
@@ -164,13 +174,19 @@ CEngine::Startup()
 	m.LoadRendererDLLs();
 
 	// startup the "gl2" renderer only, for now.
-	// also hardcode the 1024x768 resolution.
-	if ( !m.TryStartupRenderer( "gl2", 1024, 768 ) )
+	if ( !m.TryStartupRenderer( "gl2", uiScreenWidth, uiScreenHeight ) )
 	{
 		E_ASSERT( !"Failed to startup GL2 renderer." );
 		Shutdown();
 		return false;
 	}
+
+	// configure the camera.
+	m.cCamera = GrCamera(
+		MVec3(0.25F, 0.0F, 0.25F),
+		MVec3(0.0F, 0.0F, 0.0F),
+		MVec3(0.0F, 1.0F, 0.0F),
+		GrProjection( DegToRad(40.0F), (uiScreenWidth / (PxF32)uiScreenHeight), 0.02F ) );
 
 	return true;
 }
@@ -240,6 +256,10 @@ CEngine::Frame()
 		E_ASSERT( pRenderer != NULL );
 		if ( pRenderer )
 		{
+			// set the viewpoint.
+			pRenderer->SetViewpoint( m.cCamera );
+
+			// update the renderer.
 			pRenderer->Frame( uiTotalTime, fDeltaTime );
 		}
 	}

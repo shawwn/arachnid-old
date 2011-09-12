@@ -29,8 +29,8 @@ int	App_Main( int argc, char** argv )
 	System.Init( argc, argv );
 	System.NotifyOnExit( App_OnExit );
 
-	// initialize the engine.
-	if ( !Engine.Startup() )
+	// initialize the engine.  Specify a hardcoded resolution of 1024x768 for now.
+	if ( !Engine.Startup( 1024, 768 ) )
 		return 0;
 
 	// enter into the main application loop.

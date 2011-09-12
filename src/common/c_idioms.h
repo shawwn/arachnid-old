@@ -47,3 +47,12 @@
 #define E_NO_COPY(name)			\
 	name( const name& );		\
 	name&		operator = ( const name& );
+
+// swap.
+template <typename _T>
+E_INLINE void	Swap( _T& a, _T& b )
+{
+	_T c = a;
+	a = b;
+	b = c;
+}

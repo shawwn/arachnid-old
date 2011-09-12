@@ -7,6 +7,9 @@
 
 // graphics headers.
 #include "graphics/c_image.h"
+#include "graphics/gr_camera.h"
+#include "common/m_vec3.h"
+#include "common/m_mat4x4.h"
 
 // FreeGlut headers.
 #include "GL/freeglut.h"
@@ -20,9 +23,6 @@
 // EditLib headers.
 #include "editutil/editutil.h"
 #include "editutil/ed_mesh.h"
-
-// glhlib headers.
-#include "glhlib.h"
 
 //===========================================================================
 // GL2Renderer - Private state
@@ -215,9 +215,6 @@ CGL2Renderer::CGL2Renderer()
 bool
 CGL2Renderer::Startup( PxU32 uiScreenW, PxU32 uiScreenH )
 {
-	// initialize math library.
-	glhInitLibrary();
-
 	// initialize GL.
 	if ( !m.TryStartupGL( uiScreenW, uiScreenH ) )
 	{
@@ -278,11 +275,18 @@ CGL2Renderer::Shutdown()
 	glutDestroyWindow( glutGetWindow() );
 	glutMainLoopEvent();
 
-	// shutdown math library.
-	glhShutDownLibrary();
-
 	// we're outta here!  Peace!
 	delete this;
+}
+
+//---------------------------------------------------------------------------
+void
+CGL2Renderer::SetViewpoint( const GrCamera& cCamera )
+{
+	glMatrixMode( GL_PROJECTION );
+	glLoadMatrixf( cCamera.GetProjMat().GetData() );
+	glMatrixMode( GL_MODELVIEW );
+	glLoadMatrixf( cCamera.GetViewMat().GetData() );
 }
 
 //---------------------------------------------------------------------------

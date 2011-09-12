@@ -238,6 +238,22 @@
 				RelativePath="..\..\src\common\common_afx.h"
 				>
 			</File>
+			<File
+				RelativePath="..\..\src\common\m_mat4x4.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\common\m_mat4x4.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\common\m_vec3.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\common\m_vec3.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

@@ -92,6 +92,14 @@ Name="graphics"
     </File>
     <File RelativePath="..\..\src\graphics\c_image.h">
     </File>
+    <File RelativePath="..\..\src\graphics\gr_camera.cpp">
+    </File>
+    <File RelativePath="..\..\src\graphics\gr_camera.h">
+    </File>
+    <File RelativePath="..\..\src\graphics\gr_projection.cpp">
+    </File>
+    <File RelativePath="..\..\src\graphics\gr_projection.h">
+    </File>
     <File RelativePath="..\..\src\graphics\graphics_afx.cpp">
       <FileConfiguration Name="debug|x64">
         <Tool Name="VCCLCompilerTool" UsePrecompiledHeader="1" />

@@ -16,10 +16,12 @@ public:
 	~CGL2Renderer();
 	CGL2Renderer();
 
-	virtual const char*		GetName()		{	return "gl2";	}
+	const char*				GetName()		{	return "gl2";	}
 
 	bool					Startup( PxU32 uiResolutionW, PxU32 uiResolutionH );
-	virtual void			Shutdown();
+	void					Shutdown();
+
+	void					SetViewpoint( const GrCamera& cCamera );
 
 	void					Frame( PxU32 uiTotalTime, PxF32 fDeltaTime );
 

@@ -138,7 +138,6 @@
 
 			<Dependencies>
 				common
-				engine
 			</Dependencies>
 		</Target>
 
@@ -236,6 +235,7 @@
 
 			<Dependencies type="link">
 				common
+				graphics
 			</Dependencies>
 		</Target>
 
@@ -266,7 +266,6 @@
 					../../ext/glew/include
 					../../ext/anttweakbar/include
 					../../ext/meshimport/include
-					../../ext/glhlib/include
 				</SearchPaths>
 
 				<Files name="render_gl2" root="../../src/render_gl2" type="source">
@@ -284,12 +283,10 @@
 				<SearchPaths type="library" platform="win32">
 					../../ext/freeimage/lib/win32
 					../../ext/glew/lib/win32
-					../../ext/glhlib/lib/win32
 				</SearchPaths>
 				<SearchPaths type="library" platform="win64">
 					../../ext/freeimage/lib/win64
 					../../ext/glew/lib/win64
-					../../ext/glhlib/lib/win64
 				</SearchPaths>
 				<Libraries>
 					winmm.lib
@@ -299,7 +296,6 @@
 					shlwapi.lib
 					freeimage.lib
 					glew32.lib
-					glhlib.lib
 				</Libraries>
 				<Libraries platform="win32">
 					freeglut.lib

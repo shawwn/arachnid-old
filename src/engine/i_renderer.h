@@ -1,5 +1,10 @@
 #pragma once
 
+//***************************************************************************
+// Declarations
+//***************************************************************************
+class GrCamera;
+
 //===========================================================================
 // Renderer
 //===========================================================================
@@ -13,6 +18,8 @@ public:
 	virtual const char*		GetName() =0;
 
 	virtual void			Shutdown() =0;
+
+	virtual void			SetViewpoint( const GrCamera& cCamera ) =0;
 
 	virtual void			Frame( PxU32 uiTotalTime, PxF32 fDeltaTime ) =0;
 
