@@ -7,7 +7,8 @@
 *DEBUG_x*.dll
 *DEBUG_x*.exe
 *DEBUG_x*.lib
-./lib/
+lib/win32/
+lib/win64/
 *.bak
 *.suo
 *.ncb
