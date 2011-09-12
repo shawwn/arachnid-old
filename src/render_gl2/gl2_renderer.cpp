@@ -1,9 +1,21 @@
 #include "render_gl2_afx.h"
 #include "gl2_renderer.h"
 
+// engine headers.
+#include "engine/c_system.h"
+#include "engine/c_filemanager.h"
+
+// graphics headers.
+#include "graphics/c_image.h"
+
+// FreeGlut headers.
 #include "GL/freeglut.h"
 
-#include "engine/c_system.h"
+// UI headers.
+#include "AntTweakBar.h"
+
+// gl2 headers.
+#include "gl2_texture2d.h"
 
 //===========================================================================
 // GL2Renderer - Private state
@@ -12,8 +24,10 @@ class CGL2Renderer_impl
 {
 public:
 	CGL2Renderer_impl();
+	~CGL2Renderer_impl();
 
 	// Freeglut callback functions.
+	static bool				TryStartupGL( PxU32 uiScreenW, PxU32 uiScreenH );
 	static void				BindGlutCallbacks();
 	static void				OnRedraw();
 	static void				OnClose();
@@ -21,16 +35,93 @@ public:
 	static void				OnKeyUp( unsigned char c, int, int );
 
 	CGL2Renderer*			pRenderer;
-	PxU32					uiResW;
-	PxU32					uiResH;
+	PxU32					uiScreenW;
+	PxU32					uiScreenH;
+	CImage*					pTestImage;
+	GL2Texture2D*			pTestTex;
 };
+
+// our instance.
+static CGL2Renderer_impl*	g_pRenderer;
+
 
 //---------------------------------------------------------------------------
 CGL2Renderer_impl::CGL2Renderer_impl()
 : pRenderer( NULL )
-, uiResW( 512 )
-, uiResH( 512 )
+, uiScreenW( 512 )
+, uiScreenH( 512 )
 {
+	E_ASSERT( g_pRenderer == NULL );
+	g_pRenderer = this;
+}
+
+//---------------------------------------------------------------------------
+bool
+CGL2Renderer_impl::TryStartupGL( PxU32 uiScreenW, PxU32 uiScreenH )
+{
+	// initialize freeglut.
+	int argc = 0;
+	char* argv = "";
+	glutInit( &argc, &argv );
+	glutInitDisplayMode( GLUT_RGBA | GLUT_DEPTH | GLUT_STENCIL );
+	glutInitWindowPosition( 100, 100 );
+	glutInitWindowSize( uiScreenW, uiScreenH );
+	glutSetOption( GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION );
+	glutCreateWindow( "Arachnid" );
+
+	// initialize GLEW.
+	{
+		GLenum err = glewInit();
+		if ( err != GLEW_OK )
+		{
+			// glewInit failed, something is seriously wrong.
+			printf( "Error: %s\n", glewGetErrorString(err) );
+			E_ASSERT( !"failed to initialize glew" );
+			return false;
+		}
+	}
+
+
+	// verify that we support various extensions.
+	{
+// helper macro.
+#define CHECK_EXT( name )										\
+		if ( !glewIsExtensionSupported( #name ) )				\
+		{														\
+			E_ASSERT( !"extension not supported" );				\
+			printf( "Error: extension '%s' not supported!\n" ); \
+			supported = false; \
+		}
+
+		bool supported = true;
+		CHECK_EXT( GL_ARB_shader_objects );
+		CHECK_EXT( GL_ARB_texture_float );
+		CHECK_EXT( GL_ARB_texture_rectangle );
+		CHECK_EXT( GL_ARB_framebuffer_object );
+
+		// if we don't support a required extension, then abort.
+		if ( !supported )
+			return false;
+#undef CHECK_EXT
+	}
+
+	// disable vsync.
+	{
+#ifdef WIN32
+		if ( wglewGetExtension( "WGL_EXT_swap_control" ) )
+		{
+			assert( wglSwapIntervalEXT != NULL );
+			wglSwapIntervalEXT( 0 );
+		}
+#endif
+	}
+
+	// register freeglut callbacks.
+	CGL2Renderer_impl::BindGlutCallbacks();
+
+	g_pRenderer->uiScreenW = uiScreenW;
+	g_pRenderer->uiScreenH = uiScreenH;
+	return true;
 }
 
 //---------------------------------------------------------------------------
@@ -38,6 +129,19 @@ void
 CGL2Renderer_impl::OnRedraw()
 {
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
+
+	glEnable( GL_TEXTURE_2D );
+	g_pRenderer->pTestTex->Bind(0);
+
+	glBegin( GL_QUADS );
+	{
+		glTexCoord2f( 0.0F, 0.0F );  glVertex2f( -1.0F, -1.0F );
+		glTexCoord2f( 0.0F, 1.0F );  glVertex2f( -1.0F,  1.0F );
+		glTexCoord2f( 1.0F, 1.0F );  glVertex2f(  1.0F,  1.0F );
+		glTexCoord2f( 1.0F, 0.0F );  glVertex2f(  1.0F, -1.0F );
+	}
+	glEnd();
+
 	glutSwapBuffers();
 	glutPostRedisplay();
 }
@@ -74,6 +178,15 @@ CGL2Renderer_impl::BindGlutCallbacks()
 	glutKeyboardUpFunc( OnKeyUp );
 }
 
+//---------------------------------------------------------------------------
+CGL2Renderer_impl::~CGL2Renderer_impl()
+{
+	CImage::Release( pTestImage );
+
+	E_ASSERT( g_pRenderer == this );
+	g_pRenderer = NULL;
+}
+
 //===========================================================================
 // GL2Renderer
 //===========================================================================
@@ -93,23 +206,30 @@ CGL2Renderer::CGL2Renderer()
 
 //---------------------------------------------------------------------------
 bool
-CGL2Renderer::Startup( PxU32 uiResolutionW, PxU32 uiResolutionH )
+CGL2Renderer::Startup( PxU32 uiScreenW, PxU32 uiScreenH )
 {
-	m.uiResW = uiResolutionW;
-	m.uiResH = uiResolutionH;
+	// initialize GL.
+	if ( !m.TryStartupGL( uiScreenW, uiScreenH ) )
+	{
+		Shutdown();
+		return false;
+	}
 
-	// initialize freeglut.
-	int argc = 0;
-	char* argv = "";
-	glutInit( &argc, &argv );
-	glutInitDisplayMode( GLUT_RGBA | GLUT_DEPTH | GLUT_STENCIL );
-	glutInitWindowPosition( 100, 100 );
-	glutInitWindowSize( uiResolutionW, uiResolutionH );
-	glutSetOption( GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION );
-	glutCreateWindow( "Arachnid" );
 
-	// register the callbacks.
-	CGL2Renderer_impl::BindGlutCallbacks();
+	// initialize AntTweakBar.
+	if ( !TwInit( TW_OPENGL, NULL ) )
+	{
+        fprintf(stderr, "AntTweakBar initialization failed: %s\n", TwGetLastError());
+		Shutdown();
+		return false;
+	}
+
+	// load test assets.
+	{
+		m.pTestImage = CImage::LoadImageFromFile( FileManager.OpenFile("/media/props/human_head/human_head_d.jpg") );
+		m.pTestTex = GL2Texture2D::LoadFromImage( m.pTestImage );
+		m.pTestTex->Bind(0);
+	}
 
 	return true;
 }

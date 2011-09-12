@@ -31,15 +31,22 @@ extern void		TrimFast( string& sStr );
 extern string	Trim( const string& sStr );
 extern bool		StartsWith( const string& sStr, const string& sWith, bool bIgnoreCase );
 extern bool		StartsWith( const string& sStr, const string& sWith );
+extern bool		EndsWith( const string& sStr, const string& sWith, bool bIgnoreCase );
+extern bool		EndsWith( const string& sStr, const string& sWith );
 
 
 extern PxU32	SplitBy( StringList&		vResults,
+						// 'sSplitting' is being split by any character in 'sByChars.'
 						const string&		sSplitting,
 						const string&		sByChars,
 						PxU32				uiStartAt = 0,
+						// 
 						bool				bTrimWhitespace = false,
-						// 'sSplitting' is being split by any character in 'sByChars.'
-						// When 'bKeepSplitters' is true, each of those characters
-						// will be added to the results.
+						// when 'bKeepSplitters' is true, each of those characters
+						// will be added to the results. For example, 
+						// splitting "foo/bar" would result in:
+						//  [0] "foo"
+						//  [1] "/"
+						//  [2] "bar"
 						bool				bKeepSplitters = false,
 						bool				bKeepIfEmpty = false );

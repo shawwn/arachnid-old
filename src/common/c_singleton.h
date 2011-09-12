@@ -32,7 +32,7 @@ public:										\
 											\
 	static inline bool		IsAllocated()	\
 	{										\
-		return ( sInstance == NULL );		\
+		return ( sInstance != NULL );		\
 	}										\
 											\
 	static inline name*		GetInstance()	\

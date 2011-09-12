@@ -20,7 +20,7 @@ public:
 
 private:
 	// implementation is hidden from the header file, to avoid excessive recompilation.
-	E_IMPL_DECL( CEngine );
+	E_IMPL( CEngine );
 };
 
 #define Engine	(*CEngine::GetInstance())

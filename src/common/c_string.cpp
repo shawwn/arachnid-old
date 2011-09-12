@@ -136,3 +136,38 @@ StartsWith( const string& sStr, const string& sWith )
 
 	return true;
 }
+
+
+//---------------------------------------------------------------------------
+bool
+EndsWith( const string& sStr, const string& sWith, bool bIgnoreCase )
+{
+	if ( sWith.size() > sStr.size() )
+		return false;
+
+	if ( bIgnoreCase )
+	{
+		if ( strnicmp( (sStr.data() + sStr.size() - sWith.size()), sWith.data(), sWith.size() ) )
+			return false;
+	}
+	else
+	{
+		if ( strncmp( (sStr.data() + sStr.size() - sWith.size()), sWith.data(), sWith.size() ) )
+			return false;
+	}
+
+	return true;
+}
+
+//---------------------------------------------------------------------------
+bool
+EndsWith( const string& sStr, const string& sWith )
+{
+	if ( sWith.size() > sStr.size() )
+		return false;
+
+	if ( strncmp( (sStr.data() + sStr.size() - sWith.size()), sWith.data(), sWith.size() ) )
+		return false;
+
+	return true;
+}

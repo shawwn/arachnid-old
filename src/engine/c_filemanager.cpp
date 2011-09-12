@@ -1,7 +1,14 @@
 #include "engine_afx.h"
 #include "c_filemanager.h"
 
+#include "c_file.h"
+
 SINGLETON_INIT( CFileManager );
+
+//***************************************************************************
+// Declarations
+//***************************************************************************
+typedef map<string,	CFileHandle>	PathToFileMap;
 
 //===========================================================================
 // FileFind - a 3rd party snippet to find a file by wildcard.
@@ -156,6 +163,8 @@ public:
 	string	sPathToRootDir;
 	string	sWorkingDir;
 	string	sExeDir;
+
+	PathToFileMap	mapFiles;
 };
 
 //---------------------------------------------------------------------------
@@ -186,50 +195,123 @@ CFileManager::~CFileManager()
 }
 
 //---------------------------------------------------------------------------
-void
-CFileManager::SetWorkingDir( const string& sWorkingDir )
+CFileHandle&
+CFileManager::OpenFile( const string& sDirtyPath, const char* sMode /*= "rb" */ )
 {
-	m.sWorkingDir = sWorkingDir;
-	if ( m.sWorkingDir.empty() )
+	// normalize the path.
+	string sPath;
+	NormalizePath( sPath, sDirtyPath );
+
+	// if we've already opened that file, then return a handle to it.
+	{
+		PathToFileMap::iterator itFind( m.mapFiles.find(sPath) );
+		if ( itFind != m.mapFiles.end() )
+		{
+			CFileHandle& hFile( itFind->second );
+			{
+				// hmm, not sure about this.  For now, don't store FileHandles persistently,
+				// or access them concurrently.
+				hFile.Seek(0);
+			}
+			return hFile;
+		}
+	}
+
+	// try to open the file.
+	FILE* fp;
+	{
+		// build the final pathname for the OS...
+		string sSystemPath;
+		GetSystemPath( sSystemPath, sPath );
+
+		// ... and open it.
+		fp = fopen( sSystemPath.c_str(), sMode );
+		if ( !fp )
+		{
+			E_ASSERT( !"Failed to open file." );
+			return FNULL;
+		}
+	}
+
+	// determine the file's size.
+	PxU64 uiFileSize;
+	{
+		fseek( fp, 0, SEEK_END );
+		uiFileSize = ftell( fp );
+		fseek( fp, 0, SEEK_SET );
+	}
+	
+	// Note that the file is appended with zeroes in order to automatically 
+	// NULL-terminate it, as a convenience.
+	//
+	// (4 bytes ensures that it could not possibly ever behave strangely
+	// regardless of whether it's UTF-8, UTF-16, or UTF-32.)
+	const PxU32 kNullTerminatorSize( 4 );
+
+	// read the entire file into memory, for now.
+	char* pMem = (char*)MemAlloc( uiFileSize + kNullTerminatorSize );
+	size_t uiBytesRead = fread( pMem, 1, uiFileSize, fp );
+	E_ASSERT( uiBytesRead == (size_t)uiFileSize );  E_UNREF_PARAM( uiBytesRead );
+
+	// close it.
+	fclose(fp);
+
+	// NULL-terminate it.
+	MemZero( &pMem[uiFileSize], kNullTerminatorSize );
+
+	// wrap it.
+	CFile* pFile( CFile::NewFromMemory( sPath, pMem, uiFileSize, true ) );
+
+	// return a handle to it.
+	CFileHandle& hFile( m.mapFiles[sPath] );
+	E_ASSERT( hFile.m_pFile == NULL );
+	hFile.m_pFile = pFile;
+	return hFile;
+}
+
+//---------------------------------------------------------------------------
+void
+CFileManager::CloseFile( CFile*& pFile )
+{
+	if ( !pFile )
 		return;
 
-	// if working dir is not empty, then it should be relative to root,
-	// and
+	E_DELETE( pFile );
+	pFile = NULL;
 }
 
 //---------------------------------------------------------------------------
-void
-CFileManager::SetExeDir( const string& sExeDir )
+PxU32
+CFileManager::FindFiles( StringList& vResults, const string& sDirtyPath, const string& sPattern )
 {
-	m.sExeDir = sExeDir;
-}
+	size_t uiPrevResultsCount( vResults.size() );
 
-//---------------------------------------------------------------------------
-void
-CFileManager::SetPathToRootDir( const string& sPathToRootDir )
-{
-	m.sPathToRootDir = sPathToRootDir;
-}
+	// sanitize + normalize the directory.
+	string sPath;
+	GetSystemPath( sPath, sDirtyPath );
 
-//---------------------------------------------------------------------------
-const string&
-CFileManager::GetWorkingDir() const
-{
-	return m.sWorkingDir;
-}
+	// search for the files in directory 'sPath' which match the wildcard pattern 'sPattern'
+	FileFind ff( sPath.c_str(), sPattern.c_str() );
+	{
+		// for each result...
+		char sName[MAXNAME];
+		if ( ff.FindFirst( sName ) )
+		{
+			do 
+			{
+				// normalize and append it to the results list.
+				vResults.push_back(sName);
+				NormalizePath( vResults.back() );
 
-//---------------------------------------------------------------------------
-const string&
-CFileManager::GetExeDir() const
-{
-	return m.sExeDir;
-}
+				// then search for the next file.
+			} while ( ff.FindNext(sName) );
+		}
+	}
 
-//---------------------------------------------------------------------------
-const string&
-CFileManager::GetPathToRootDir() const
-{
-	return m.sPathToRootDir;
+	if ( vResults.size() <= uiPrevResultsCount )
+		return 0;
+	else
+		return (PxU32)(vResults.size() - uiPrevResultsCount);
 }
 
 //---------------------------------------------------------------------------
@@ -289,10 +371,62 @@ CFileManager::NormalizePath( const string& sPath )
 
 //---------------------------------------------------------------------------
 void
-CFileManager::GetSystemPath( string& sOutPath, const string& sPath )
+CFileManager::SetWorkingDir( const string& sWorkingDir )
 {
-	sOutPath = NormalizePath( sPath );
-	if ( sOutPath.empty() )
+	m.sWorkingDir = sWorkingDir;
+	if ( m.sWorkingDir.empty() )
+		return;
+
+	// if working dir is not empty, then it should be relative to root,
+	// and
+}
+
+//---------------------------------------------------------------------------
+void
+CFileManager::SetExeDir( const string& sExeDir )
+{
+	m.sExeDir = sExeDir;
+}
+
+//---------------------------------------------------------------------------
+void
+CFileManager::SetPathToRootDir( const string& sPathToRootDir )
+{
+	m.sPathToRootDir = sPathToRootDir;
+
+	// ensure that it doesn't end with a slash.
+	if ( EndsWith(m.sPathToRootDir, "/") )
+	{
+		m.sPathToRootDir = m.sPathToRootDir.substr(0, (m.sPathToRootDir.size() - 1));
+	}
+}
+
+//---------------------------------------------------------------------------
+const string&
+CFileManager::GetWorkingDir() const
+{
+	return m.sWorkingDir;
+}
+
+//---------------------------------------------------------------------------
+const string&
+CFileManager::GetExeDir() const
+{
+	return m.sExeDir;
+}
+
+//---------------------------------------------------------------------------
+const string&
+CFileManager::GetPathToRootDir() const
+{
+	return m.sPathToRootDir;
+}
+
+//---------------------------------------------------------------------------
+void
+CFileManager::GetSystemPath( string& sOutPath, const string& sNormalizedPath )
+{
+	if ( sNormalizedPath.empty() )
 		return;
 
 	// determine whether this is an absolute path, such as "c:/foo/asdf.txt"
@@ -332,50 +466,6 @@ CFileManager::GetSystemPath( string& sOutPath, const string& sPath )
 	//
 	if ( !bAbsolute )
 	{
-		NormalizePath( sOutPath, (GetPathToRootDir() + sOutPath) );
+		sOutPath = GetPathToRootDir() + sNormalizedPath;
 	}
 }
-
-//---------------------------------------------------------------------------
-string
-CFileManager::GetSystemPath( const string& sPath )
-{
-	string sResult;
-	GetSystemPath( sResult, sPath );
-	return sResult;
-}
-
-//---------------------------------------------------------------------------
-PxU32
-CFileManager::FindFiles( StringList& vResults, const string& sDirtyPath, const string& sPattern )
-{
-	size_t uiPrevResultsCount( vResults.size() );
-
-	// sanitize + normalize the directory.
-	string sPath;
-	GetSystemPath( sPath, sDirtyPath );
-
-	// search for the files in directory 'sPath' which match the wildcard pattern 'sPattern'
-	FileFind ff( sPath.c_str(), sPattern.c_str() );
-	{
-		// for each result...
-		char sName[MAXNAME];
-		if ( ff.FindFirst( sName ) )
-		{
-			do 
-			{
-				// normalize and append it to the results list.
-				vResults.push_back(sName);
-				NormalizePath( vResults.back() );
-
-				// then search for the next file.
-			} while ( ff.FindNext(sName) );
-		}
-	}
-
-	if ( vResults.size() <= uiPrevResultsCount )
-		return 0;
-	else
-		return (PxU32)(vResults.size() - uiPrevResultsCount);
-}
-

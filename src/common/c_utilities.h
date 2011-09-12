@@ -15,7 +15,7 @@ PxU64 HashMem64( const void* mem, PxU32 size, PxU64 hashStart = 1469598103934665
 //===========================================================================
 
 //---------------------------------------------------------------------------
-template < typename _T >
+template <typename _T>
 E_INLINE void	Swap( _T& a, _T& b )
 {
 	_T c = a;
@@ -24,8 +24,8 @@ E_INLINE void	Swap( _T& a, _T& b )
 }
 
 //---------------------------------------------------------------------------
-template < typename _T >
-E_INLINE void	Min( _T& a, _T& b )
+template <typename _T>
+E_INLINE _T	Min( _T a, _T b )
 {
 	if ( a < b )
 		return a;
@@ -34,8 +34,8 @@ E_INLINE void	Min( _T& a, _T& b )
 }
 
 //---------------------------------------------------------------------------
-template < typename _T >
-E_INLINE void	Max( _T& a, _T& b )
+template <typename _T>
+E_INLINE _T	Max( _T a, _T b )
 {
 	if ( a > b )
 		return a;

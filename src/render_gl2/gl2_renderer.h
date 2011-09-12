@@ -24,5 +24,5 @@ public:
 	void					Frame( PxU32 uiTotalTime, PxF32 fDeltaTime );
 
 private:
-	E_IMPL_DECL( CGL2Renderer );
+	E_IMPL( CGL2Renderer );
 };

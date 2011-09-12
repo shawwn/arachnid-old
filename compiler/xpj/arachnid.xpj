@@ -89,8 +89,8 @@
 				<SearchPaths type="header">
 					../../src
 					../../ext
-					../../ext/freeimage/include
 					../../ext/freeglut/include
+					../../ext/freeimage/include
 					../../ext/anttweakbar/include
 				</SearchPaths>
 
@@ -136,6 +136,7 @@
 
 			<Dependencies>
 				common
+				engine
 			</Dependencies>
 		</Target>
 
@@ -179,7 +180,6 @@
 				<PrecompiledHeader>engine_afx.h</PrecompiledHeader>
 
 				<SearchPaths type="library">
-					../../ext/freeimage/lib
 					../../ext/anttweakbar/lib
 				</SearchPaths>
 				<Libraries>
@@ -188,8 +188,6 @@
 					winmm.lib
 					comctl32.lib
 					shlwapi.lib
-
-					freeimage.lib
 				</Libraries>
 				<Libraries platform="win32">
 					anttweakbar.lib
@@ -235,7 +233,6 @@
 
 			<Dependencies type="link">
 				common
-				graphics
 			</Dependencies>
 		</Target>
 
@@ -262,6 +259,7 @@
 					../../ext
 					../../ext/freeimage/include
 					../../ext/freeglut/include
+					../../ext/glew/include
 					../../ext/anttweakbar/include
 				</SearchPaths>
 
@@ -274,9 +272,16 @@
 				<PrecompiledHeader>render_gl2_afx.h</PrecompiledHeader>
 
 				<SearchPaths type="library">
-					../../ext/freeimage/lib
 					../../ext/freeglut/lib
 					../../ext/anttweakbar/lib
+				</SearchPaths>
+				<SearchPaths type="library" platform="win32">
+					../../ext/freeimage/lib/win32
+					../../ext/glew/lib/win32
+				</SearchPaths>
+				<SearchPaths type="library" platform="win64">
+					../../ext/freeimage/lib/win64
+					../../ext/glew/lib/win64
 				</SearchPaths>
 				<Libraries>
 					winmm.lib
@@ -284,8 +289,8 @@
 					winmm.lib
 					comctl32.lib
 					shlwapi.lib
-
 					freeimage.lib
+					glew32.lib
 				</Libraries>
 				<Libraries platform="win32">
 					freeglut.lib
@@ -358,7 +363,6 @@
 				<SearchPaths type="header">
 					../../src
 					../../ext
-					../../ext/freeimage/include
 					../../ext/freeglut/include
 					../../ext/anttweakbar/include
 				</SearchPaths>

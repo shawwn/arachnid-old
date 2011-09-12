@@ -35,7 +35,7 @@ public:
 	PxU32		GetCurTime();
 
 private:
-	E_IMPL_DECL( CSystem );
+	E_IMPL( CSystem );
 };
 
 #define System	(*CSystem::GetInstance())

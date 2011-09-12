@@ -1,5 +1,7 @@
 #pragma once
 
+#include "engine/c_filehandle.h"
+
 //***************************************************************************
 // Declarations
 //***************************************************************************
@@ -14,6 +16,14 @@ class E_API CFileManager
 public:
 	~CFileManager();
 
+	CFileHandle&	OpenFile( const string& sPath, const char* sMode = "rb" ); // todo: refactor 'sMode' into bitflags.
+	void			CloseFile( CFile*& pFile );
+
+	PxU32			FindFiles( StringList& vResults, const string& sPath, const string& sPattern );
+
+	void			NormalizePath( string& sOutPath, const string& sPath );
+	string			NormalizePath( const string& sPath );
+
 	// Relative to root.
 	void			SetWorkingDir( const string& sWorkingDir );
 	// Relative to root.  (E.g. "/bin/win32/")
@@ -27,17 +37,13 @@ public:
 	const string&	GetExeDir() const;
 	const string&	GetPathToRootDir() const;
 
-	void			NormalizePath( string& sOutPath, const string& sPath );
-	string			NormalizePath( const string& sPath );
-
-	void			GetSystemPath( string& sOutPath, const string& sPath );
-	string			GetSystemPath( const string& sPath );
-
-	PxU32			FindFiles( StringList& vResults, const string& sPath, const string& sPattern );
-
 private:
+	// debating whether to make this public; hidden for now.
+	friend class CSystem;
+	void			GetSystemPath( string& sOutPath, const string& sNormalizedPath );
+
 	// implementation is hidden from the header file, to avoid excessive recompilation.
-	E_IMPL_DECL( CFileManager );
+	E_IMPL( CFileManager );
 };
 
 #define FileManager	(*CFileManager::GetInstance())

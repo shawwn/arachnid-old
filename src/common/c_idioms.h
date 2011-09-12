@@ -35,7 +35,7 @@
 #define E_ARRAY_COUNT( TheType, TheArray )	(sizeof(TheArray) / sizeof(TheType))
 
 // pointer-to-implementation.
-#define E_IMPL_DECL(name)		\
+#define E_IMPL(name)		\
 	name##_impl* const	mImpl;	\
 	name##_impl&		m;
 #define E_IMPL_NAME(name)		\

@@ -136,7 +136,8 @@ using physx::PxI64;
 using physx::PxF32;
 using physx::PxF64;
 
-
+// assume a char is always 8 bits.
+typedef PxU8	byte;
 
 //===========================================================================
 // Assertion
