@@ -4,6 +4,7 @@
 // Precompiled GL2Renderer headers.
 //***************************************************************************
 #include "engine/engine_afx.h"
+#include "render_gl2/gl2_config.h"
 #include "render_gl2/gl2_types.h"
 
 // precompile the GL headers (thus requiring windows.h).

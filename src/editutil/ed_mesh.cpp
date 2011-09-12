@@ -79,6 +79,15 @@ EdMesh::LoadFromFile( CFileHandle& hFile )
 		return NULL;
 	}
 
-	EdMesh* pRet = E_NEW(EdMesh);
+	EdMesh* pRet			= E_NEW(EdMesh);
+	pRet->m.pMeshContainer	= pMeshContainer;
+	pRet->m.pMesh			= pMesh;
 	return pRet;
+}
+
+//---------------------------------------------------------------------------
+NVSHARE::MeshSystem*
+EdMesh::GetMesh()
+{
+	return m.pMesh;
 }

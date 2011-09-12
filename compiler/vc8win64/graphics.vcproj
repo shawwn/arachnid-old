@@ -151,19 +151,19 @@
 			Name="graphics"
 			>
 			<File
-				RelativePath="..\..\src\graphics\c_image.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\graphics\c_image.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\graphics\gr_camera.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\src\graphics\gr_camera.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\graphics\gr_image.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\graphics\gr_image.h"
 				>
 			</File>
 			<File

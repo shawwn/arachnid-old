@@ -23,6 +23,12 @@
 // EditLib headers.
 #include "editutil/editutil.h"
 #include "editutil/ed_mesh.h"
+#include "MeshImport/MeshImport.h"
+
+//***************************************************************************
+// Declarations
+//***************************************************************************
+void DrawMesh( NVSHARE::MeshSystem* ms );
 
 //===========================================================================
 // GL2Renderer - Private state
@@ -46,6 +52,7 @@ public:
 	PxU32					uiScreenH;
 	GrImage*				pTestImage;
 	GL2Texture2D*			pTestTex;
+	EdMesh*					pMesh;
 };
 
 // our instance.
@@ -137,9 +144,21 @@ CGL2Renderer_impl::OnRedraw()
 {
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 
+	glEnable( GL_DEPTH_TEST );
+	glDepthFunc( GL_LEQUAL );
+
 	glEnable( GL_TEXTURE_2D );
 	g_pRenderer->pTestTex->Bind(0);
 
+#if 1
+	{
+		// render the mesh.
+		NVSHARE::MeshSystem* pMeshSystem = NULL;
+		if ( g_pRenderer && g_pRenderer->pMesh )
+			pMeshSystem = g_pRenderer->pMesh->GetMesh();
+		DrawMesh( pMeshSystem );
+	}
+#else
 	glBegin( GL_QUADS );
 	{
 		glTexCoord2f( 0.0F, 0.0F );  glVertex2f( -1.0F, -1.0F );
@@ -148,6 +167,7 @@ CGL2Renderer_impl::OnRedraw()
 		glTexCoord2f( 1.0F, 0.0F );  glVertex2f(  1.0F, -1.0F );
 	}
 	glEnd();
+#endif
 
 	glutSwapBuffers();
 	glutPostRedisplay();
@@ -249,8 +269,7 @@ CGL2Renderer::Startup( PxU32 uiScreenW, PxU32 uiScreenH )
 
 		// mesh.
 		{
-			EdMesh* pMesh = EdMesh::LoadFromFile( FileManager.OpenFile("/media/props/human_head/human_head.obj" ) );
-			E_DELETE(pMesh);
+			m.pMesh = EdMesh::LoadFromFile( FileManager.OpenFile("/media/props/human_head/human_head.obj" ) );
 		}
 	}
 
@@ -262,6 +281,7 @@ void
 CGL2Renderer::Shutdown()
 {
 	// free test assets.
+	E_DELETE( m.pMesh );
 	E_DELETE( m.pTestImage );
 	E_DELETE( m.pTestTex );
 
@@ -296,4 +316,52 @@ CGL2Renderer::Frame( PxU32 uiTotalTime, PxF32 fDeltaTime )
 	E_UNREF_PARAM2( uiTotalTime, fDeltaTime );
 	printf( "clock: %d\t\tdt: %f\n", uiTotalTime, fDeltaTime );
 	glutMainLoopEvent();
+}
+
+//***************************************************************************
+// Definitions
+//***************************************************************************
+using namespace NVSHARE;
+
+//---------------------------------------------------------------------------
+void
+DrawMesh( NVSHARE::MeshSystem* ms )
+{
+	E_ASSERT( ms );
+	if ( !ms )
+		return;
+
+	glBegin( GL_TRIANGLES );
+
+	for ( NxU32 iMesh = 0; iMesh < ms->mMeshCount; ++iMesh )
+	{
+		Mesh* m = ms->mMeshes[ iMesh ];
+
+		for ( NxU32 iSub = 0; iSub < m->mSubMeshCount; ++iSub )
+		{
+			SubMesh* sm = m->mSubMeshes[ iSub ];
+
+			for ( NxU32 iTri = 0; iTri < sm->mTriCount; ++iTri )
+			{
+				NxU32 i0 = sm->mIndices[ 3*iTri + 0 ];
+				NxU32 i1 = sm->mIndices[ 3*iTri + 1 ];
+				NxU32 i2 = sm->mIndices[ 3*iTri + 2 ];
+				MeshVertex* v0 = &m->mVertices[ i0 ];
+				MeshVertex* v1 = &m->mVertices[ i1 ];
+				MeshVertex* v2 = &m->mVertices[ i2 ];
+
+#if 1
+				glTexCoord2fv( v0->mTexel1 ); glVertex3fv( v0->mPos );
+				glTexCoord2fv( v1->mTexel1 ); glVertex3fv( v1->mPos );
+				glTexCoord2fv( v2->mTexel1 ); glVertex3fv( v2->mPos );
+#else
+				glVertexAttrib2fv( GR_ATTRIB_TEXCOORD_INDEX, v0->mTexel1 ); glVertexAttrib3fv( GR_ATTRIB_POSITION_INDEX, v0->mPos );
+				glVertexAttrib2fv( GR_ATTRIB_TEXCOORD_INDEX, v1->mTexel1 ); glVertexAttrib3fv( GR_ATTRIB_POSITION_INDEX, v1->mPos );
+				glVertexAttrib2fv( GR_ATTRIB_TEXCOORD_INDEX, v2->mTexel1 ); glVertexAttrib3fv( GR_ATTRIB_POSITION_INDEX, v2->mPos );
+#endif
+			}
+		}
+	}
+
+	glEnd();
 }
