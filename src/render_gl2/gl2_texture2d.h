@@ -5,7 +5,7 @@
 //***************************************************************************
 // Declarations
 //***************************************************************************
-class CImage;
+class GrImage;
 
 //===========================================================================
 // Texture2D
@@ -16,7 +16,7 @@ class GL2Texture2D : public GL2TextureBase
 public:
 	~GL2Texture2D();
 
-	static GL2Texture2D*	LoadFromImage( CImage* pImage );
+	static GL2Texture2D*	LoadFromImage( GrImage* pImage );
 
 	virtual PxU32			GetGLHandle()	{ return m_uiHandle; }
 	virtual void			Bind( PxU32 uiTexUnit );

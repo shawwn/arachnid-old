@@ -3,20 +3,20 @@
 //***************************************************************************
 // Declarations
 //***************************************************************************
-class CImage_impl;
+class GrImage_impl;
 class CFileHandle;
 
 //===========================================================================
 // Image
 //	A class to represent a BGRA 2D image.
 //===========================================================================
-class CImage
+class GrImage
 {
-	CImage();
+	GrImage();
 public:
-	~CImage();
-	static CImage*	CreateImage( PxU32 uiWidth, PxU32 uiHeight );
-	static CImage*	LoadImageFromFile( CFileHandle& cFile );
+	~GrImage();
+	static GrImage*	CreateImage( PxU32 uiWidth, PxU32 uiHeight );
+	static GrImage*	LoadImageFromFile( CFileHandle& cFile );
 
 	PxU32			GetWidth();
 	PxU32			GetHeight();
@@ -24,5 +24,5 @@ public:
 	byte*			GetPixels();
 
 private:
-	E_IMPL( CImage );
+	E_IMPL( GrImage );
 };

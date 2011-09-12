@@ -1,9 +1,11 @@
 #include "graphics_afx.h"
-#include "c_image.h"
+#include "gr_image.h"
 
+// engine headers.
 #include "engine/c_filemanager.h"
 #include "engine/c_file.h"
 
+// FreeImage headers.
 #include "FreeImage.h"
 
 //***************************************************************************
@@ -23,11 +25,11 @@ void _stdcall _OutputMessageFunctionStdCall(FREE_IMAGE_FORMAT fif, const char *m
 //===========================================================================
 // Image - Private Implementation
 //===========================================================================
-class CImage_impl
+class GrImage_impl
 {
 public:
-	~CImage_impl();
-	CImage_impl();
+	~GrImage_impl();
+	GrImage_impl();
 
 	PxU32			uiWidth;
 	PxU32			uiHeight;
@@ -39,14 +41,14 @@ public:
 };
 
 //---------------------------------------------------------------------------
-CImage_impl::~CImage_impl()
+GrImage_impl::~GrImage_impl()
 {
 	if ( pDib )
 		FreeImage_Unload( pDib );
 }
 
 //---------------------------------------------------------------------------
-CImage_impl::CImage_impl()
+GrImage_impl::GrImage_impl()
 : uiWidth(0)
 , uiHeight(0)
 , uiBitsPerPixel(0)
@@ -60,20 +62,20 @@ CImage_impl::CImage_impl()
 //===========================================================================
 
 //---------------------------------------------------------------------------
-CImage::CImage()
-: E_IMPL_NEW(CImage)
+GrImage::GrImage()
+: E_IMPL_NEW(GrImage)
 {
 }
 
 //---------------------------------------------------------------------------
-CImage::~CImage()
+GrImage::~GrImage()
 {
-	E_IMPL_DEL(CImage);
+	E_IMPL_DEL(GrImage);
 }
 
 //---------------------------------------------------------------------------
-CImage*
-CImage::LoadImageFromFile( CFileHandle& cFile )
+GrImage*
+GrImage::LoadImageFromFile( CFileHandle& cFile )
 {
 	E_ASSERT( cFile.IsOpen() );
 	if ( !cFile.IsOpen() )
@@ -129,7 +131,7 @@ CImage::LoadImageFromFile( CFileHandle& cFile )
 		return NULL;
 	}
 
-	CImage* pImg = E_NEW(CImage);
+	GrImage* pImg = E_NEW(GrImage);
 	pImg->m.uiWidth = width;
 	pImg->m.uiHeight = height;
 	pImg->m.uiBitsPerPixel = FreeImage_GetBPP(dib);
@@ -140,28 +142,28 @@ CImage::LoadImageFromFile( CFileHandle& cFile )
 
 //---------------------------------------------------------------------------
 PxU32
-CImage::GetWidth()
+GrImage::GetWidth()
 {
 	return m.uiWidth;
 }
 
 //---------------------------------------------------------------------------
 PxU32
-CImage::GetHeight()
+GrImage::GetHeight()
 {
 	return m.uiHeight;
 }
 
 //---------------------------------------------------------------------------
 PxU32
-CImage::GetBitsPerPixel()
+GrImage::GetBitsPerPixel()
 {
 	return m.uiBitsPerPixel;
 }
 
 //---------------------------------------------------------------------------
 byte*
-CImage::GetPixels()
+GrImage::GetPixels()
 {
 	return (byte*)m.pPixels;
 }

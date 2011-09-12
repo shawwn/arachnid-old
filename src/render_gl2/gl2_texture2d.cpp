@@ -2,7 +2,7 @@
 #include "gl2_texture2d.h"
 
 // graphics headers.
-#include "graphics/c_image.h"
+#include "graphics/gr_image.h"
 
 //===========================================================================
 // Texture2D
@@ -10,7 +10,7 @@
 
 //---------------------------------------------------------------------------
 GL2Texture2D*
-GL2Texture2D::LoadFromImage( CImage* pImage )
+GL2Texture2D::LoadFromImage( GrImage* pImage )
 {
 	if ( !pImage )
 		return NULL;

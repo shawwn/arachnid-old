@@ -6,7 +6,7 @@
 #include "engine/c_filemanager.h"
 
 // graphics headers.
-#include "graphics/c_image.h"
+#include "graphics/gr_image.h"
 #include "graphics/gr_camera.h"
 #include "common/m_vec3.h"
 #include "common/m_mat4x4.h"
@@ -44,7 +44,7 @@ public:
 	CGL2Renderer*			pRenderer;
 	PxU32					uiScreenW;
 	PxU32					uiScreenH;
-	CImage*					pTestImage;
+	GrImage*				pTestImage;
 	GL2Texture2D*			pTestTex;
 };
 
@@ -242,7 +242,7 @@ CGL2Renderer::Startup( PxU32 uiScreenW, PxU32 uiScreenH )
 	{
 		// textures.
 		{
-			m.pTestImage = CImage::LoadImageFromFile( FileManager.OpenFile("/media/props/human_head/human_head_d.jpg") );
+			m.pTestImage = GrImage::LoadImageFromFile( FileManager.OpenFile("/media/props/human_head/human_head_d.jpg") );
 			m.pTestTex = GL2Texture2D::LoadFromImage( m.pTestImage );
 			m.pTestTex->Bind(0);
 		}
