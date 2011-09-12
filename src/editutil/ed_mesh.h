@@ -3,26 +3,20 @@
 //***************************************************************************
 // Declarations
 //***************************************************************************
-class CImage_impl;
+class EdMesh_impl;
 class CFileHandle;
 
 //===========================================================================
-// Image
-//	A class to represent a BGRA 2D image.
+// EdMesh
 //===========================================================================
-class CImage
+class ED_API EdMesh
 {
-	CImage();
+	EdMesh();
 public:
-	~CImage();
-	static CImage*	CreateImage( PxU32 uiWidth, PxU32 uiHeight );
-	static CImage*	LoadImageFromFile( CFileHandle& cFile );
+	~EdMesh();
 
-	PxU32			GetWidth();
-	PxU32			GetHeight();
-	PxU32			GetBitsPerPixel();
-	byte*			GetPixels();
+	static EdMesh*		LoadFromFile( CFileHandle& hFile );
 
 private:
-	E_IMPL( CImage );
+	E_IMPL( EdMesh );
 };

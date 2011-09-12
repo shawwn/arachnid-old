@@ -1,292 +1,156 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	ProjectType="Visual C++"
-	Version="9.00"
-	Name="render_gl2"
-	ProjectGUID="{E43DBE16-7374-3ACA-839C-44B4F3AED4D8}"
-	TargetFrameworkVersion="0"
-	>
-	<Platforms>
-		<Platform
-			Name="x64"
-		/>
-	</Platforms>
-	<ToolFiles>
-	</ToolFiles>
-	<Configurations>
-		<Configuration
-			Name="debug|x64"
-			OutputDirectory="../../bin/win64"
-			IntermediateDirectory="build/x64/render_gl2/debug"
-			ConfigurationType="2"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalOptions="/fp:fast /W4 /WX /MDd /Zi "
-				Optimization="4"
-				AdditionalIncludeDirectories="&quot;../../src&quot;;&quot;../../ext&quot;;&quot;../../ext/freeimage/include&quot;;&quot;../../ext/freeglut/include&quot;;&quot;../../ext/glew/include&quot;;&quot;../../ext/anttweakbar/include&quot;;"
-				PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;UNICODE=1;RENDER_GL2_EXPORTS;_DEBUG;"
-				ExceptionHandling="1"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="render_gl2_afx.h"
-				WarningLevel="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions="/DEBUG /DEBUG "
-				AdditionalDependencies="&quot;winmm.lib&quot; &quot;dbghelp.lib&quot; &quot;winmm.lib&quot; &quot;comctl32.lib&quot; &quot;shlwapi.lib&quot; &quot;freeimage.lib&quot; &quot;glew32.lib&quot; &quot;freeglut_x64.lib&quot; &quot;anttweakbar64.lib&quot; "
-				OutputFile="$(OutDir)/render_gl2DEBUG_x64.dll"
-				AdditionalLibraryDirectories="&quot;../../ext/freeglut/lib&quot;;&quot;../../ext/anttweakbar/lib&quot;;&quot;../../ext/freeimage/lib/win64&quot;;&quot;../../ext/glew/lib/win64&quot;;"
-				ProgramDatabaseFile="$(OutDir)/render_gl2DEBUG_x64.dll.pdb"
-				GenerateMapFile="true"
-				MapFileName="$(OutDir)/render_gl2DEBUG_x64.dll.map"
-				SubSystem="1"
-				ImportLibrary="$(OutDir)/$(TargetName).lib"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="release|x64"
-			OutputDirectory="../../bin/win64"
-			IntermediateDirectory="build/x64/render_gl2/release"
-			ConfigurationType="2"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalOptions="/fp:fast /WX /W4 /MD /Zi /O2 "
-				Optimization="4"
-				AdditionalIncludeDirectories="&quot;../../src&quot;;&quot;../../ext&quot;;&quot;../../ext/freeimage/include&quot;;&quot;../../ext/freeglut/include&quot;;&quot;../../ext/glew/include&quot;;&quot;../../ext/anttweakbar/include&quot;;"
-				PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;UNICODE=1;RENDER_GL2_EXPORTS;NDEBUG;"
-				ExceptionHandling="1"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="render_gl2_afx.h"
-				WarningLevel="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions="/DEBUG "
-				AdditionalDependencies="&quot;winmm.lib&quot; &quot;dbghelp.lib&quot; &quot;winmm.lib&quot; &quot;comctl32.lib&quot; &quot;shlwapi.lib&quot; &quot;freeimage.lib&quot; &quot;glew32.lib&quot; &quot;freeglut_x64.lib&quot; &quot;anttweakbar64.lib&quot; "
-				OutputFile="$(OutDir)/render_gl2_x64.dll"
-				AdditionalLibraryDirectories="&quot;../../ext/freeglut/lib&quot;;&quot;../../ext/anttweakbar/lib&quot;;&quot;../../ext/freeimage/lib/win64&quot;;&quot;../../ext/glew/lib/win64&quot;;"
-				ProgramDatabaseFile="$(OutDir)/render_gl2_x64.dll.pdb"
-				GenerateMapFile="true"
-				MapFileName="$(OutDir)/render_gl2_x64.dll.map"
-				SubSystem="1"
-				ImportLibrary="$(OutDir)/$(TargetName).lib"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-	</Configurations>
-	<References>
-	</References>
-	<Files>
-		<Filter
-			Name="render_gl2"
-			>
-			<File
-				RelativePath="..\..\src\render_gl2\gl2_config.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\render_gl2\gl2_config.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\render_gl2\gl2_framebuffer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\render_gl2\gl2_framebuffer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\render_gl2\gl2_main.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\render_gl2\gl2_main.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\render_gl2\gl2_renderer.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\render_gl2\gl2_renderer.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\render_gl2\gl2_shader.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\render_gl2\gl2_shader.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\render_gl2\gl2_texture2d.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\render_gl2\gl2_texture2d.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\render_gl2\gl2_texture3d.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\render_gl2\gl2_texture3d.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\render_gl2\gl2_texturebase.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\render_gl2\gl2_texturebase.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\render_gl2\gl2_texturecube.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\render_gl2\gl2_texturecube.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\render_gl2\gl2_types.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\render_gl2\gl2_types.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\render_gl2\gl2_util.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\render_gl2\gl2_util.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\render_gl2\render_gl2_afx.cpp"
-				>
-				<FileConfiguration
-					Name="debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\..\src\render_gl2\render_gl2_afx.h"
-				>
-			</File>
-		</Filter>
-	</Files>
-	<Globals>
-	</Globals>
+ProjectType="Visual C++"
+Version="9.00"
+Name="render_gl2"
+>
+<Platforms>
+<Platform Name="x64"/>
+</Platforms>
+<Configurations>
+  <Configuration
+    Name="debug|x64"
+    OutputDirectory="../../bin/win64"
+    IntermediateDirectory="build/x64/render_gl2/debug"
+    ConfigurationType="2"
+    CharacterSet="2"
+    >
+    <Tool
+      Name="VCCLCompilerTool"
+      AdditionalIncludeDirectories="&quot;../../src&quot;;&quot;../../ext&quot;;&quot;../../ext/freeimage/include&quot;;&quot;../../ext/freeglut/include&quot;;&quot;../../ext/glew/include&quot;;&quot;../../ext/anttweakbar/include&quot;;&quot;../../ext/meshimport/include&quot;;"
+      PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;UNICODE=1;RENDER_GL2_EXPORTS;_DEBUG;"
+      WarningLevel="3"
+      Optimization="4"
+      AdditionalOptions="/fp:fast /W4 /WX /MDd /Zi "
+      ExceptionHandling="1"
+      UsePrecompiledHeader="2"
+      PrecompiledHeaderThrough="render_gl2_afx.h"
+      />
+    <Tool Name="VCCustomBuildTool"/>
+    <Tool 
+      Name="VCLinkerTool" 
+      OutputFile="$(OutDir)/render_gl2DEBUG_x64.dll" 
+      ProgramDatabaseFile="$(OutDir)/render_gl2DEBUG_x64.dll.pdb" 
+      AdditionalOptions="/DEBUG /DEBUG "
+      AdditionalDependencies="&quot;winmm.lib&quot; &quot;dbghelp.lib&quot; &quot;winmm.lib&quot; &quot;comctl32.lib&quot; &quot;shlwapi.lib&quot; &quot;freeimage.lib&quot; &quot;glew32.lib&quot; &quot;freeglut_x64.lib&quot; &quot;anttweakbar64.lib&quot; "
+      AdditionalLibraryDirectories="&quot;../../ext/freeglut/lib&quot;;&quot;../../ext/anttweakbar/lib&quot;;&quot;../../ext/freeimage/lib/win64&quot;;&quot;../../ext/glew/lib/win64&quot;;"
+      ImportLibrary="$(OutDir)/$(TargetName).lib"
+      GenerateMapFile="TRUE"
+      MapFileName="$(OutDir)/render_gl2DEBUG_x64.dll.map"
+      SubSystem="1"
+      />
+    <Tool Name="VCMIDLTool"/>
+    <Tool Name="VCPreBuildEventTool"/>
+    <Tool Name="VCPostBuildEventTool"/>
+    <Tool Name="VCPreLinkEventTool"/>
+    <Tool Name="VCResourceCompilerTool"/>
+    <Tool Name="VCWebServiceProxyGeneratorTool"/>
+    <Tool Name="VCXMLDataGeneratorTool"/>
+    <Tool Name="VCWebDeploymentTool"/>
+    <Tool Name="VCManagedWrapperGeneratorTool"/>
+    <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+  </Configuration>
+  <Configuration
+    Name="release|x64"
+    OutputDirectory="../../bin/win64"
+    IntermediateDirectory="build/x64/render_gl2/release"
+    ConfigurationType="2"
+    CharacterSet="2"
+    >
+    <Tool
+      Name="VCCLCompilerTool"
+      AdditionalIncludeDirectories="&quot;../../src&quot;;&quot;../../ext&quot;;&quot;../../ext/freeimage/include&quot;;&quot;../../ext/freeglut/include&quot;;&quot;../../ext/glew/include&quot;;&quot;../../ext/anttweakbar/include&quot;;&quot;../../ext/meshimport/include&quot;;"
+      PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;UNICODE=1;RENDER_GL2_EXPORTS;NDEBUG;"
+      WarningLevel="3"
+      Optimization="4"
+      AdditionalOptions="/fp:fast /WX /W4 /MD /Zi /O2 "
+      ExceptionHandling="1"
+      UsePrecompiledHeader="2"
+      PrecompiledHeaderThrough="render_gl2_afx.h"
+      />
+    <Tool Name="VCCustomBuildTool"/>
+    <Tool 
+      Name="VCLinkerTool" 
+      OutputFile="$(OutDir)/render_gl2_x64.dll" 
+      ProgramDatabaseFile="$(OutDir)/render_gl2_x64.dll.pdb" 
+      AdditionalOptions="/DEBUG "
+      AdditionalDependencies="&quot;winmm.lib&quot; &quot;dbghelp.lib&quot; &quot;winmm.lib&quot; &quot;comctl32.lib&quot; &quot;shlwapi.lib&quot; &quot;freeimage.lib&quot; &quot;glew32.lib&quot; &quot;freeglut_x64.lib&quot; &quot;anttweakbar64.lib&quot; "
+      AdditionalLibraryDirectories="&quot;../../ext/freeglut/lib&quot;;&quot;../../ext/anttweakbar/lib&quot;;&quot;../../ext/freeimage/lib/win64&quot;;&quot;../../ext/glew/lib/win64&quot;;"
+      ImportLibrary="$(OutDir)/$(TargetName).lib"
+      GenerateMapFile="TRUE"
+      MapFileName="$(OutDir)/render_gl2_x64.dll.map"
+      SubSystem="1"
+      />
+    <Tool Name="VCMIDLTool"/>
+    <Tool Name="VCPreBuildEventTool"/>
+    <Tool Name="VCPostBuildEventTool"/>
+    <Tool Name="VCPreLinkEventTool"/>
+    <Tool Name="VCResourceCompilerTool"/>
+    <Tool Name="VCWebServiceProxyGeneratorTool"/>
+    <Tool Name="VCXMLDataGeneratorTool"/>
+    <Tool Name="VCWebDeploymentTool"/>
+    <Tool Name="VCManagedWrapperGeneratorTool"/>
+    <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+  </Configuration>
+</Configurations>
+<References></References>
+<Files>
+  <Filter Name="render_gl2" Filter="">
+    <File RelativePath="..\..\src\render_gl2\gl2_config.cpp">
+    </File>
+    <File RelativePath="..\..\src\render_gl2\gl2_config.h">
+    </File>
+    <File RelativePath="..\..\src\render_gl2\gl2_framebuffer.cpp">
+    </File>
+    <File RelativePath="..\..\src\render_gl2\gl2_framebuffer.h">
+    </File>
+    <File RelativePath="..\..\src\render_gl2\gl2_main.cpp">
+    </File>
+    <File RelativePath="..\..\src\render_gl2\gl2_main.h">
+    </File>
+    <File RelativePath="..\..\src\render_gl2\gl2_renderer.cpp">
+    </File>
+    <File RelativePath="..\..\src\render_gl2\gl2_renderer.h">
+    </File>
+    <File RelativePath="..\..\src\render_gl2\gl2_shader.cpp">
+    </File>
+    <File RelativePath="..\..\src\render_gl2\gl2_shader.h">
+    </File>
+    <File RelativePath="..\..\src\render_gl2\gl2_texture2d.cpp">
+    </File>
+    <File RelativePath="..\..\src\render_gl2\gl2_texture2d.h">
+    </File>
+    <File RelativePath="..\..\src\render_gl2\gl2_texture3d.cpp">
+    </File>
+    <File RelativePath="..\..\src\render_gl2\gl2_texture3d.h">
+    </File>
+    <File RelativePath="..\..\src\render_gl2\gl2_texturebase.cpp">
+    </File>
+    <File RelativePath="..\..\src\render_gl2\gl2_texturebase.h">
+    </File>
+    <File RelativePath="..\..\src\render_gl2\gl2_texturecube.cpp">
+    </File>
+    <File RelativePath="..\..\src\render_gl2\gl2_texturecube.h">
+    </File>
+    <File RelativePath="..\..\src\render_gl2\gl2_types.cpp">
+    </File>
+    <File RelativePath="..\..\src\render_gl2\gl2_types.h">
+    </File>
+    <File RelativePath="..\..\src\render_gl2\gl2_util.cpp">
+    </File>
+    <File RelativePath="..\..\src\render_gl2\gl2_util.h">
+    </File>
+    <File RelativePath="..\..\src\render_gl2\render_gl2_afx.cpp">
+      <FileConfiguration Name="debug|x64">
+        <Tool Name="VCCLCompilerTool" UsePrecompiledHeader="1" />
+      </FileConfiguration>
+      <FileConfiguration Name="release|x64">
+        <Tool Name="VCCLCompilerTool" UsePrecompiledHeader="1" />
+      </FileConfiguration>
+    </File>
+    <File RelativePath="..\..\src\render_gl2\render_gl2_afx.h">
+    </File>
+  </Filter>
+</Files>
+<Globals></Globals>
 </VisualStudioProject>

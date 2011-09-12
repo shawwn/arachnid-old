@@ -265,6 +265,7 @@
 					../../ext/freeglut/include
 					../../ext/glew/include
 					../../ext/anttweakbar/include
+					../../ext/meshimport/include
 				</SearchPaths>
 
 				<Files name="render_gl2" root="../../src/render_gl2" type="source">
@@ -336,6 +337,109 @@
 			<Configuration name="release" platform="win64">
 				<OutDir>../../bin/win64</OutDir>
 				<OutFile>render_gl2_x64</OutFile>
+				<CFlags>/fp:fast /WX /W4 /MD /Zi /O2</CFlags>
+				<Preprocessor type="define">NDEBUG</Preprocessor>
+			</Configuration>
+
+			<Dependencies type="link">
+				common
+				graphics
+				engine
+				editutil
+			</Dependencies>
+		</Target>
+
+		<!-- ===================================== -->
+		<!-- = editutil                            -->
+		<!-- ===================================== -->
+		<Target name="editutil">
+			<Export platform="win32" tool="vc9">../vc9win32</Export>
+			<Export platform="win32" tool="vc8">../vc8win32</Export>
+			<Export platform="win64" tool="vc9">../vc9win64</Export>
+			<Export platform="win64" tool="vc8">../vc8win64</Export>
+			<Configuration name="default" type="dll">
+				<Preprocessor type="define">
+					WIN32
+					_WINDOWS
+					_CRT_SECURE_NO_DEPRECATE
+					_CRT_NONSTDC_NO_DEPRECATE
+					UNICODE=1
+					EDITUTIL_EXPORTS
+				</Preprocessor>
+				<CFlags tool="vc8"></CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<SearchPaths type="header">
+					../../src
+					../../ext
+					../../ext/freeimage/include
+					../../ext/meshimport/include
+				</SearchPaths>
+
+				<Files name="meshimport" root="../../ext/meshimport/include/MeshImport" type="source">
+					*.cpp
+					*.h
+				</Files>
+
+				<Files name="editutil" root="../../src/editutil" type="source">
+					*.hpp
+					*.cpp
+					*.h
+					*.c
+				</Files>
+				<PrecompiledHeader>editutil_afx.h</PrecompiledHeader>
+
+				<SearchPaths type="library">
+				</SearchPaths>
+				<SearchPaths type="library" platform="win32">
+					../../ext/freeimage/lib/win32
+				</SearchPaths>
+				<SearchPaths type="library" platform="win64">
+					../../ext/freeimage/lib/win64
+				</SearchPaths>
+				<Libraries>
+					winmm.lib
+					dbghelp.lib
+					winmm.lib
+					comctl32.lib
+					shlwapi.lib
+					freeimage.lib
+				</Libraries>
+				<Libraries platform="win32">
+				</Libraries>
+				<Libraries platform="win64">
+				</Libraries>
+			</Configuration>
+
+			<Configuration name="debug" platform="win32">
+				<OutDir>../../bin/win32</OutDir>
+				<OutFile>editutilDEBUG_x86</OutFile>
+				<CFlags>/fp:fast /W4 /WX /MDd /Zi</CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<Preprocessor type="define">
+					_DEBUG
+				</Preprocessor>
+			</Configuration>
+			<Configuration name="debug" platform="win64">
+				<OutDir>../../bin/win64</OutDir>
+				<OutFile>editutilDEBUG_x64</OutFile>
+				<CFlags>/fp:fast /W4 /WX /MDd /Zi</CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<Preprocessor type="define">
+					_DEBUG
+				</Preprocessor>
+			</Configuration>
+
+			<Configuration name="release" platform="win32">
+				<OutDir>../../bin/win32</OutDir>
+				<OutFile>editutil_x86</OutFile>
+				<CFlags>/fp:fast /WX /W4 /MD /Zi /O2</CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<Preprocessor type="define">NDEBUG</Preprocessor>
+			</Configuration>
+
+			<Configuration name="release" platform="win64">
+				<OutDir>../../bin/win64</OutDir>
+				<OutFile>editutil_x64</OutFile>
 				<CFlags>/fp:fast /WX /W4 /MD /Zi /O2</CFlags>
 				<Preprocessor type="define">NDEBUG</Preprocessor>
 			</Configuration>

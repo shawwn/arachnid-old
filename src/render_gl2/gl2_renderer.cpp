@@ -17,6 +17,10 @@
 // gl2 headers.
 #include "gl2_texture2d.h"
 
+// EditLib headers.
+#include "editutil/editutil.h"
+#include "editutil/ed_mesh.h"
+
 //===========================================================================
 // GL2Renderer - Private state
 //===========================================================================
@@ -181,7 +185,7 @@ CGL2Renderer_impl::BindGlutCallbacks()
 //---------------------------------------------------------------------------
 CGL2Renderer_impl::~CGL2Renderer_impl()
 {
-	CImage::Release( pTestImage );
+	E_DELETE( pTestImage );
 
 	E_ASSERT( g_pRenderer == this );
 	g_pRenderer = NULL;
@@ -215,8 +219,7 @@ CGL2Renderer::Startup( PxU32 uiScreenW, PxU32 uiScreenH )
 		return false;
 	}
 
-
-	// initialize AntTweakBar.
+	// initialize AntTweakBar UI library.
 	if ( !TwInit( TW_OPENGL, NULL ) )
 	{
         fprintf(stderr, "AntTweakBar initialization failed: %s\n", TwGetLastError());
@@ -224,11 +227,28 @@ CGL2Renderer::Startup( PxU32 uiScreenW, PxU32 uiScreenH )
 		return false;
 	}
 
+	// initialize EditUtil library.
+	if ( !Ed_Startup() )
+	{
+        E_ASSERT( !"EditUtil failed to initialize." );
+		Shutdown();
+		return false;
+	}
+
 	// load test assets.
 	{
-		m.pTestImage = CImage::LoadImageFromFile( FileManager.OpenFile("/media/props/human_head/human_head_d.jpg") );
-		m.pTestTex = GL2Texture2D::LoadFromImage( m.pTestImage );
-		m.pTestTex->Bind(0);
+		// textures.
+		{
+			m.pTestImage = CImage::LoadImageFromFile( FileManager.OpenFile("/media/props/human_head/human_head_d.jpg") );
+			m.pTestTex = GL2Texture2D::LoadFromImage( m.pTestImage );
+			m.pTestTex->Bind(0);
+		}
+
+		// mesh.
+		{
+			EdMesh* pMesh = EdMesh::LoadFromFile( FileManager.OpenFile("/media/props/human_head/human_head.obj" ) );
+			E_DELETE(pMesh);
+		}
 	}
 
 	return true;
@@ -238,8 +258,21 @@ CGL2Renderer::Startup( PxU32 uiScreenW, PxU32 uiScreenH )
 void
 CGL2Renderer::Shutdown()
 {
+	// free test assets.
+	E_DELETE( m.pTestImage );
+	E_DELETE( m.pTestTex );
+
+	// shutdown EditLib.
+	Ed_Shutdown();
+
+	// shutdown UI library.
+	TwTerminate();
+
+	// shutdown GL.
 	glutDestroyWindow( glutGetWindow() );
 	glutMainLoopEvent();
+
+	// we're outta here!  Peace!
 	delete this;
 }
 
