@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject
+ProjectType="Visual C++"
+Version="9.00"
+Name="arachnid"
+>
+<Platforms>
+<Platform Name="Win32"/>
+</Platforms>
+<Configurations>
+  <Configuration
+    Name="debug|Win32"
+    OutputDirectory="../../bin/win32"
+    IntermediateDirectory="build/Win32/arachnid/debug"
+    ConfigurationType="1"
+    CharacterSet="2"
+    >
+    <Tool
+      Name="VCCLCompilerTool"
+      AdditionalIncludeDirectories="&quot;../../src&quot;;&quot;../../ext&quot;;&quot;../../ext/freeglut/include&quot;;&quot;../../ext/anttweakbar/include&quot;;"
+      PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;UNICODE=1;_DEBUG;"
+      WarningLevel="3"
+      Optimization="4"
+      AdditionalOptions="/fp:fast /W4 /WX /MDd /Zi "
+      ExceptionHandling="1"
+      />
+    <Tool Name="VCCustomBuildTool"/>
+    <Tool 
+      Name="VCLinkerTool" 
+      OutputFile="$(OutDir)/arachnidDEBUG_x86.exe" 
+      ProgramDatabaseFile="$(OutDir)/arachnidDEBUG_x86.exe.pdb" 
+      AdditionalOptions="/DEBUG "
+      AdditionalDependencies=""
+      AdditionalLibraryDirectories=""
+      GenerateMapFile="TRUE"
+      MapFileName="$(OutDir)/arachnidDEBUG_x86.exe.map"
+      SubSystem="2"
+      />
+    <Tool Name="VCMIDLTool"/>
+    <Tool Name="VCPreBuildEventTool"/>
+    <Tool Name="VCPostBuildEventTool" CommandLine="editbin /SUBSYSTEM:CONSOLE &quot;$(TargetPath)&quot;"/>
+    <Tool Name="VCPreLinkEventTool"/>
+    <Tool Name="VCResourceCompilerTool"/>
+    <Tool Name="VCWebServiceProxyGeneratorTool"/>
+    <Tool Name="VCXMLDataGeneratorTool"/>
+    <Tool Name="VCWebDeploymentTool"/>
+    <Tool Name="VCManagedWrapperGeneratorTool"/>
+    <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+<Tool Name="VCManifestTool" EmbedManifest="false" />
+  </Configuration>
+  <Configuration
+    Name="release|Win32"
+    OutputDirectory="../../bin/win32"
+    IntermediateDirectory="build/Win32/arachnid/release"
+    ConfigurationType="1"
+    CharacterSet="2"
+    >
+    <Tool
+      Name="VCCLCompilerTool"
+      AdditionalIncludeDirectories="&quot;../../src&quot;;&quot;../../ext&quot;;&quot;../../ext/freeglut/include&quot;;&quot;../../ext/anttweakbar/include&quot;;"
+      PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;UNICODE=1;NDEBUG;"
+      WarningLevel="3"
+      Optimization="4"
+      AdditionalOptions="/fp:fast /WX /W4 /MD /Zi /O2 "
+      ExceptionHandling="1"
+      />
+    <Tool Name="VCCustomBuildTool"/>
+    <Tool 
+      Name="VCLinkerTool" 
+      OutputFile="$(OutDir)/arachnid_x86.exe" 
+      ProgramDatabaseFile="$(OutDir)/arachnid_x86.exe.pdb" 
+      AdditionalOptions="/DEBUG "
+      AdditionalDependencies=""
+      AdditionalLibraryDirectories=""
+      GenerateMapFile="TRUE"
+      MapFileName="$(OutDir)/arachnid_x86.exe.map"
+      SubSystem="2"
+      />
+    <Tool Name="VCMIDLTool"/>
+    <Tool Name="VCPreBuildEventTool"/>
+    <Tool Name="VCPostBuildEventTool" CommandLine="editbin /SUBSYSTEM:CONSOLE &quot;$(TargetPath)&quot;"/>
+    <Tool Name="VCPreLinkEventTool"/>
+    <Tool Name="VCResourceCompilerTool"/>
+    <Tool Name="VCWebServiceProxyGeneratorTool"/>
+    <Tool Name="VCXMLDataGeneratorTool"/>
+    <Tool Name="VCWebDeploymentTool"/>
+    <Tool Name="VCManagedWrapperGeneratorTool"/>
+    <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+<Tool Name="VCManifestTool" EmbedManifest="false" />
+  </Configuration>
+</Configurations>
+<References></References>
+<Files>
+  <Filter Name="arachnid" Filter="">
+    <File RelativePath="..\..\app\arachnid\arachnid_main.cpp">
+    </File>
+  </Filter>
+</Files>
+<Globals></Globals>
+</VisualStudioProject>

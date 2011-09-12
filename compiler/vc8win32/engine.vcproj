@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject
+ProjectType="Visual C++"
+Version="8.00"
+Name="engine"
+>
+<Platforms>
+<Platform Name="Win32"/>
+</Platforms>
+<Configurations>
+  <Configuration
+    Name="debug|Win32"
+    OutputDirectory="../../bin/win32"
+    IntermediateDirectory="build/Win32/engine/debug"
+    ConfigurationType="2"
+    CharacterSet="2"
+    >
+    <Tool
+      Name="VCCLCompilerTool"
+      AdditionalIncludeDirectories="&quot;../../src&quot;;&quot;../../ext&quot;;"
+      PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;UNICODE=1;ENGINE_EXPORTS;_DEBUG;"
+      WarningLevel="3"
+      Optimization="4"
+      AdditionalOptions="/wd4996 /wd4505 /fp:fast /W4 /WX /MDd /Zi "
+      ExceptionHandling="1"
+      UsePrecompiledHeader="2"
+      PrecompiledHeaderThrough="engine_afx.h"
+      />
+    <Tool Name="VCCustomBuildTool"/>
+    <Tool 
+      Name="VCLinkerTool" 
+      OutputFile="$(OutDir)/engineDEBUG_x86.dll" 
+      ProgramDatabaseFile="$(OutDir)/engineDEBUG_x86.dll.pdb" 
+      AdditionalOptions="/DEBUG /DEBUG "
+      AdditionalDependencies="&quot;winmm.lib&quot; &quot;dbghelp.lib&quot; &quot;winmm.lib&quot; &quot;comctl32.lib&quot; &quot;shlwapi.lib&quot; &quot;anttweakbar.lib&quot; "
+      AdditionalLibraryDirectories="&quot;../../ext/anttweakbar/lib&quot;;"
+      ImportLibrary="$(OutDir)/$(TargetName).lib"
+      GenerateMapFile="TRUE"
+      MapFileName="$(OutDir)/engineDEBUG_x86.dll.map"
+      SubSystem="1"
+      />
+    <Tool Name="VCMIDLTool"/>
+    <Tool Name="VCPreBuildEventTool"/>
+    <Tool Name="VCPostBuildEventTool"/>
+    <Tool Name="VCPreLinkEventTool"/>
+    <Tool Name="VCResourceCompilerTool"/>
+    <Tool Name="VCWebServiceProxyGeneratorTool"/>
+    <Tool Name="VCXMLDataGeneratorTool"/>
+    <Tool Name="VCWebDeploymentTool"/>
+    <Tool Name="VCManagedWrapperGeneratorTool"/>
+    <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+  </Configuration>
+  <Configuration
+    Name="release|Win32"
+    OutputDirectory="../../bin/win32"
+    IntermediateDirectory="build/Win32/engine/release"
+    ConfigurationType="2"
+    CharacterSet="2"
+    >
+    <Tool
+      Name="VCCLCompilerTool"
+      AdditionalIncludeDirectories="&quot;../../src&quot;;&quot;../../ext&quot;;"
+      PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;UNICODE=1;ENGINE_EXPORTS;NDEBUG;"
+      WarningLevel="3"
+      Optimization="4"
+      AdditionalOptions="/wd4996 /wd4505 /fp:fast /WX /W4 /MD /Zi /O2 "
+      ExceptionHandling="1"
+      UsePrecompiledHeader="2"
+      PrecompiledHeaderThrough="engine_afx.h"
+      />
+    <Tool Name="VCCustomBuildTool"/>
+    <Tool 
+      Name="VCLinkerTool" 
+      OutputFile="$(OutDir)/engine_x86.dll" 
+      ProgramDatabaseFile="$(OutDir)/engine_x86.dll.pdb" 
+      AdditionalOptions="/DEBUG /DEBUG "
+      AdditionalDependencies="&quot;winmm.lib&quot; &quot;dbghelp.lib&quot; &quot;winmm.lib&quot; &quot;comctl32.lib&quot; &quot;shlwapi.lib&quot; &quot;anttweakbar.lib&quot; "
+      AdditionalLibraryDirectories="&quot;../../ext/anttweakbar/lib&quot;;"
+      ImportLibrary="$(OutDir)/$(TargetName).lib"
+      GenerateMapFile="TRUE"
+      MapFileName="$(OutDir)/engine_x86.dll.map"
+      SubSystem="1"
+      />
+    <Tool Name="VCMIDLTool"/>
+    <Tool Name="VCPreBuildEventTool"/>
+    <Tool Name="VCPostBuildEventTool"/>
+    <Tool Name="VCPreLinkEventTool"/>
+    <Tool Name="VCResourceCompilerTool"/>
+    <Tool Name="VCWebServiceProxyGeneratorTool"/>
+    <Tool Name="VCXMLDataGeneratorTool"/>
+    <Tool Name="VCWebDeploymentTool"/>
+    <Tool Name="VCManagedWrapperGeneratorTool"/>
+    <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+  </Configuration>
+</Configurations>
+<References></References>
+<Files>
+  <Filter Name="engine" Filter="">
+    <Filter Name="windows" Filter="">
+      <File RelativePath="..\..\src\engine\windows\c_system.cpp">
+      </File>
+    </Filter>
+    <File RelativePath="..\..\src\engine\c_engine.cpp">
+    </File>
+    <File RelativePath="..\..\src\engine\c_engine.h">
+    </File>
+    <File RelativePath="..\..\src\engine\c_file.cpp">
+    </File>
+    <File RelativePath="..\..\src\engine\c_file.h">
+    </File>
+    <File RelativePath="..\..\src\engine\c_filehandle.cpp">
+    </File>
+    <File RelativePath="..\..\src\engine\c_filehandle.h">
+    </File>
+    <File RelativePath="..\..\src\engine\c_filemanager.cpp">
+    </File>
+    <File RelativePath="..\..\src\engine\c_filemanager.h">
+    </File>
+    <File RelativePath="..\..\src\engine\c_modelresource.cpp">
+    </File>
+    <File RelativePath="..\..\src\engine\c_modelresource.h">
+    </File>
+    <File RelativePath="..\..\src\engine\c_resourcecommon.cpp">
+    </File>
+    <File RelativePath="..\..\src\engine\c_resourcecommon.h">
+    </File>
+    <File RelativePath="..\..\src\engine\c_resourcelibrary.cpp">
+    </File>
+    <File RelativePath="..\..\src\engine\c_resourcelibrary.h">
+    </File>
+    <File RelativePath="..\..\src\engine\c_resourcemanager.cpp">
+    </File>
+    <File RelativePath="..\..\src\engine\c_resourcemanager.h">
+    </File>
+    <File RelativePath="..\..\src\engine\c_system.h">
+    </File>
+    <File RelativePath="..\..\src\engine\c_textureresource.cpp">
+    </File>
+    <File RelativePath="..\..\src\engine\c_textureresource.h">
+    </File>
+    <File RelativePath="..\..\src\engine\engine_afx.cpp">
+      <FileConfiguration Name="debug|Win32">
+        <Tool Name="VCCLCompilerTool" UsePrecompiledHeader="1" />
+      </FileConfiguration>
+      <FileConfiguration Name="release|Win32">
+        <Tool Name="VCCLCompilerTool" UsePrecompiledHeader="1" />
+      </FileConfiguration>
+    </File>
+    <File RelativePath="..\..\src\engine\engine_afx.h">
+    </File>
+    <File RelativePath="..\..\src\engine\engine_version.h">
+    </File>
+    <File RelativePath="..\..\src\engine\i_renderer.cpp">
+    </File>
+    <File RelativePath="..\..\src\engine\i_renderer.h">
+    </File>
+    <File RelativePath="..\..\src\engine\i_resource.cpp">
+    </File>
+    <File RelativePath="..\..\src\engine\i_resource.h">
+    </File>
+  </Filter>
+</Files>
+<Globals></Globals>
+</VisualStudioProject>
