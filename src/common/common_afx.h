@@ -1,6 +1,14 @@
 #pragma once
 
 //***************************************************************************
+// Globally disable some very annoying Microsoft compiler warnings.
+// Note: I have thought about this carefully, and have determined that it
+// should be safe for our purposes.
+//***************************************************************************
+#pragma warning( disable: 4996 )
+#pragma warning( disable: 4505 )
+
+//***************************************************************************
 // Globally-shared precompiled headers.  These are pulled into every namespace.
 //***************************************************************************
 #include "common/c_preprocessor.h"

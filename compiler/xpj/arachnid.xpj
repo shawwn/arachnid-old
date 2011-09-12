@@ -18,9 +18,10 @@
 					WIN32
 					_WINDOWS
 					_CRT_SECURE_NO_DEPRECATE
+					_CRT_NONSTDC_NO_DEPRECATE
 					UNICODE=1
 				</Preprocessor>
-				<CFlags tool="vc8">/wd4996 /wd4505</CFlags>
+				<CFlags tool="vc8"></CFlags>
 				<SearchPaths type="header">
 					../../src
 					../../ext
@@ -83,9 +84,10 @@
 					WIN32
 					_WINDOWS
 					_CRT_SECURE_NO_DEPRECATE
+					_CRT_NONSTDC_NO_DEPRECATE
 					UNICODE=1
 				</Preprocessor>
-				<CFlags tool="vc8">/wd4996 /wd4505</CFlags>
+				<CFlags tool="vc8"></CFlags>
 				<SearchPaths type="header">
 					../../src
 					../../ext
@@ -153,10 +155,11 @@
 					WIN32
 					_WINDOWS
 					_CRT_SECURE_NO_DEPRECATE
+					_CRT_NONSTDC_NO_DEPRECATE
 					UNICODE=1
 					ENGINE_EXPORTS
 				</Preprocessor>
-				<CFlags tool="vc8">/wd4996 /wd4505</CFlags>
+				<CFlags tool="vc8"></CFlags>
 				<LFlags>/DEBUG</LFlags>
 				<SearchPaths type="header">
 					../../src
@@ -249,10 +252,11 @@
 					WIN32
 					_WINDOWS
 					_CRT_SECURE_NO_DEPRECATE
+					_CRT_NONSTDC_NO_DEPRECATE
 					UNICODE=1
 					RENDER_GL2_EXPORTS
 				</Preprocessor>
-				<CFlags tool="vc8">/wd4996 /wd4505</CFlags>
+				<CFlags tool="vc8"></CFlags>
 				<LFlags>/DEBUG</LFlags>
 				<SearchPaths type="header">
 					../../src
@@ -357,9 +361,10 @@
 					WIN32
 					_WINDOWS
 					_CRT_SECURE_NO_DEPRECATE
+					_CRT_NONSTDC_NO_DEPRECATE
 					UNICODE=1
 				</Preprocessor>
-				<CFlags tool="vc8">/wd4996 /wd4505</CFlags>
+				<CFlags tool="vc8"></CFlags>
 				<SearchPaths type="header">
 					../../src
 					../../ext
