@@ -21,6 +21,9 @@
 #include "editutil/editutil.h"
 #include "editutil/ed_mesh.h"
 
+// glhlib headers.
+#include "glhlib.h"
+
 //===========================================================================
 // GL2Renderer - Private state
 //===========================================================================
@@ -212,6 +215,9 @@ CGL2Renderer::CGL2Renderer()
 bool
 CGL2Renderer::Startup( PxU32 uiScreenW, PxU32 uiScreenH )
 {
+	// initialize math library.
+	glhInitLibrary();
+
 	// initialize GL.
 	if ( !m.TryStartupGL( uiScreenW, uiScreenH ) )
 	{
@@ -271,6 +277,9 @@ CGL2Renderer::Shutdown()
 	// shutdown GL.
 	glutDestroyWindow( glutGetWindow() );
 	glutMainLoopEvent();
+
+	// shutdown math library.
+	glhShutDownLibrary();
 
 	// we're outta here!  Peace!
 	delete this;

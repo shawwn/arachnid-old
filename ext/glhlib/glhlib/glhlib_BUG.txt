@@ -1,0 +1,11 @@
+BUG IN glhScaleImage2_asm386
+
+	widthin	1032
+	heightin	744
+	widthout	1012
+	heightout	723
+
+glhScaleImage_asm386
+24 bit, 1024 768 to 1024 512 doesn't work
+and 4 bit data alignment
+

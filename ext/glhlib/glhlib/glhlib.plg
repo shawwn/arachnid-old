@@ -1,0 +1,101 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: glhlib - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\Users\vrej\AppData\Local\Temp\RSP86DB.tmp" with contents
+[
+/nologo /G6 /Gz /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "GLHLIB_EXPORTS" /Fp"Release/glhlib.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"D:\MyDocs\GLHLIB\3DGraphicsLibrarySmall.cpp"
+"D:\MyDocs\GLHLIB\glhlib.cpp"
+"D:\MyDocs\GLHLIB\glhlib10.cpp"
+"D:\MyDocs\GLHLIB\glhlib2.cpp"
+"D:\MyDocs\GLHLIB\glhlib3.cpp"
+"D:\MyDocs\GLHLIB\glhlib4.cpp"
+"D:\MyDocs\GLHLIB\glhlib5.cpp"
+"D:\MyDocs\GLHLIB\glhlib6.cpp"
+"D:\MyDocs\GLHLIB\glhlib8.cpp"
+"D:\MyDocs\GLHLIB\glhlib9.cpp"
+"D:\MyDocs\GLHLIB\TBaseShape.cpp"
+"D:\MyDocs\GLHLIB\TChamferCylinder.cpp"
+"D:\MyDocs\GLHLIB\TCone.cpp"
+"D:\MyDocs\GLHLIB\TCube.cpp"
+"D:\MyDocs\GLHLIB\TCube2.cpp"
+"D:\MyDocs\GLHLIB\TCylinder.cpp"
+"D:\MyDocs\GLHLIB\TCylinder2.cpp"
+"D:\MyDocs\GLHLIB\TSphere.cpp"
+"D:\MyDocs\GLHLIB\TSphere2.cpp"
+"D:\MyDocs\GLHLIB\TTorus.cpp"
+"D:\MyDocs\GLHLIB\TTube.cpp"
+]
+Creating command line "cl.exe @C:\Users\vrej\AppData\Local\Temp\RSP86DB.tmp" 
+Creating temporary file "C:\Users\vrej\AppData\Local\Temp\RSP86DC.tmp" with contents
+[
+opengl32.lib glu32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /incremental:no /pdb:"Release/glhlib.pdb" /machine:I386 /def:".\glhlib.def" /out:"Release/glhlib.dll" /implib:"Release/glhlib.lib" 
+.\Release\3DGraphicsLibrarySmall.obj
+.\Release\glhlib.obj
+.\Release\glhlib10.obj
+.\Release\glhlib2.obj
+.\Release\glhlib3.obj
+.\Release\glhlib4.obj
+.\Release\glhlib5.obj
+.\Release\glhlib6.obj
+.\Release\glhlib8.obj
+.\Release\glhlib9.obj
+.\Release\MemoryManagement.obj
+.\Release\StdAfx.obj
+.\Release\TBaseShape.obj
+.\Release\TChamferCylinder.obj
+.\Release\TCone.obj
+.\Release\TCube.obj
+.\Release\TCube2.obj
+.\Release\TCylinder.obj
+.\Release\TCylinder2.obj
+.\Release\TSphere.obj
+.\Release\TSphere2.obj
+.\Release\TTorus.obj
+.\Release\TTube.obj
+.\Release\glhlib.res
+]
+Creating command line "link.exe @C:\Users\vrej\AppData\Local\Temp\RSP86DC.tmp"
+<h3>Output Window</h3>
+Compiling...
+3DGraphicsLibrarySmall.cpp
+glhlib.cpp
+glhlib10.cpp
+glhlib2.cpp
+glhlib3.cpp
+glhlib4.cpp
+glhlib5.cpp
+glhlib6.cpp
+glhlib8.cpp
+glhlib9.cpp
+TBaseShape.cpp
+TChamferCylinder.cpp
+D:\MyDocs\GLHLIB\TChamferCylinder.cpp(551) : warning C4101: 'tempo5' : unreferenced local variable
+D:\MyDocs\GLHLIB\TChamferCylinder.cpp(551) : warning C4101: 'tempo6' : unreferenced local variable
+TCone.cpp
+TCube.cpp
+TCube2.cpp
+TCylinder.cpp
+TCylinder2.cpp
+TSphere.cpp
+TSphere2.cpp
+TTorus.cpp
+Generating Code...
+Compiling...
+TTube.cpp
+Generating Code...
+Linking...
+   Creating library Release/glhlib.lib and object Release/glhlib.exp
+
+
+
+<h3>Results</h3>
+glhlib.dll - 0 error(s), 2 warning(s)
+</pre>
+</body>
+</html>

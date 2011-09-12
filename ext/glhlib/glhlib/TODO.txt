@@ -1,0 +1,13 @@
+TODO ==================================
+=======================================
+Add glhTorusf2
+-X- Add glhPartialSpheref2
+A lot of older functions did not make use of glhGetError. Standardize them.
+-X- Software matrix stack support (CANCELED)
+DDS file support (read and write)
+Do a Linux version
+
+FUTURE
+============
+3D file support(?) (use the X file format from DX)
+Function for loading DDS textures from Win32 resource (maybe)
