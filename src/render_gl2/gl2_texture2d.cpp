@@ -53,6 +53,8 @@ GL2Texture2D::~GL2Texture2D()
 void
 GL2Texture2D::Bind( PxU32 uiTexUnit )
 {
+	E_UNREF_PARAM( uiTexUnit );
+
 	E_ASSERT( uiTexUnit < 16 );
 	//glActiveTexture( GL_TEXTURE0 + uiTexUnit );
 	glBindTexture( GL_TEXTURE_2D, GetGLHandle() );
