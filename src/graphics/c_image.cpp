@@ -4,7 +4,6 @@
 #include "engine/c_filemanager.h"
 #include "engine/c_file.h"
 
-#define FREEIMAGE_LIB
 #include "FreeImage.h"
 
 //***************************************************************************
@@ -16,8 +15,8 @@ inline unsigned DLL_CALLCONV _ReadProc(void *buffer, unsigned size, unsigned cou
 inline unsigned DLL_CALLCONV _WriteProc(void *buffer, unsigned size, unsigned count, fi_handle handle);
 inline int DLL_CALLCONV _SeekProc(fi_handle handle, long offset, int origin);
 inline long DLL_CALLCONV _TellProc(fi_handle handle);
-void DLL_CALLCONV _OutputMessageFunction(FREE_IMAGE_FORMAT fif, const char *msg); 
-void DLL_CALLCONV _OutputMessageFunctionStdCall(FREE_IMAGE_FORMAT fif, const char *msg); 
+void _OutputMessageFunction(FREE_IMAGE_FORMAT fif, const char *msg); 
+void _stdcall _OutputMessageFunctionStdCall(FREE_IMAGE_FORMAT fif, const char *msg); 
 
 
 
@@ -252,7 +251,7 @@ _OutputMessageFunction(FREE_IMAGE_FORMAT fif, const char *msg)
 }
 
 //---------------------------------------------------------------------------
-void DLL_CALLCONV
+void _stdcall
 _OutputMessageFunctionStdCall(FREE_IMAGE_FORMAT fif, const char *msg)
 {
 	printf( "FreeImage[0x%X]: %s", fif, msg );
