@@ -240,6 +240,14 @@ CFileManager::OpenFile( const string& sDirtyPath, const char* sMode /*= "rb" */ 
 		uiFileSize = ftell( fp );
 		fseek( fp, 0, SEEK_SET );
 	}
+
+	// if the file is over 4GB, don't allow it to be opned for now.
+	if ( uiFileSize > 0xFFFFFFFF )
+	{
+		E_ASSERT( !"File too large." );
+		fclose( fp );
+		return FNULL;
+	}
 	
 	// Note that the file is appended with zeroes in order to automatically 
 	// NULL-terminate it, as a convenience.
@@ -249,8 +257,8 @@ CFileManager::OpenFile( const string& sDirtyPath, const char* sMode /*= "rb" */ 
 	const PxU32 kNullTerminatorSize( 4 );
 
 	// read the entire file into memory, for now.
-	char* pMem = (char*)MemAlloc( uiFileSize + kNullTerminatorSize );
-	size_t uiBytesRead = fread( pMem, 1, uiFileSize, fp );
+	char* pMem = (char*)MemAlloc( (size_t)(uiFileSize + kNullTerminatorSize) );
+	size_t uiBytesRead = fread( pMem, 1, (size_t)uiFileSize, fp );
 	E_ASSERT( uiBytesRead == (size_t)uiFileSize );  E_UNREF_PARAM( uiBytesRead );
 
 	// close it.

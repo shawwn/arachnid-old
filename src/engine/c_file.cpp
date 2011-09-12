@@ -124,7 +124,7 @@ CFile::Read( void* pDst, PxU32 uiNumBytes )
 	E_ASSERT( uiSrcEnd >= uiSrc );
 
 	// read the data.
-	MemCopy( pDst, (pSrc + uiSrc), uiCount );
+	MemCopy( pDst, (pSrc + uiSrc), (size_t)uiCount );;
 
 	// advance the read pointer.
 	m.uiPos += uiCount;

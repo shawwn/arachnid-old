@@ -12,10 +12,10 @@
 //***************************************************************************
 
 // FreeImage I/O callbacks.
-inline unsigned _stdcall _ReadProc(void *buffer, unsigned size, unsigned count, fi_handle handle); 
-inline unsigned _stdcall _WriteProc(void *buffer, unsigned size, unsigned count, fi_handle handle);
-inline int _stdcall _SeekProc(fi_handle handle, long offset, int origin);
-inline long _stdcall _TellProc(fi_handle handle);
+inline unsigned DLL_CALLCONV _ReadProc(void *buffer, unsigned size, unsigned count, fi_handle handle); 
+inline unsigned DLL_CALLCONV _WriteProc(void *buffer, unsigned size, unsigned count, fi_handle handle);
+inline int DLL_CALLCONV _SeekProc(fi_handle handle, long offset, int origin);
+inline long DLL_CALLCONV _TellProc(fi_handle handle);
 void DLL_CALLCONV _OutputMessageFunction(FREE_IMAGE_FORMAT fif, const char *msg); 
 void DLL_CALLCONV _OutputMessageFunctionStdCall(FREE_IMAGE_FORMAT fif, const char *msg); 
 
@@ -179,7 +179,7 @@ CImage::GetPixels()
 //===========================================================================
 
 // ----------------------------------------------------------
-inline unsigned _stdcall
+inline unsigned DLL_CALLCONV
 _ReadProc(void *buffer, unsigned size, unsigned count, fi_handle handle)
 {
 	CFile* pFile( (CFile*)handle );
@@ -197,7 +197,7 @@ _ReadProc(void *buffer, unsigned size, unsigned count, fi_handle handle)
 }
 
 // ----------------------------------------------------------
-inline unsigned _stdcall
+inline unsigned DLL_CALLCONV
 _WriteProc(void *buffer, unsigned size, unsigned count, fi_handle handle)
 {
 	E_UNREF_PARAM3( handle, count, buffer );
@@ -206,7 +206,7 @@ _WriteProc(void *buffer, unsigned size, unsigned count, fi_handle handle)
 }
 
 // ----------------------------------------------------------
-inline int _stdcall
+inline int DLL_CALLCONV
 _SeekProc(fi_handle handle, long offset, int origin)
 {
 	CFile* pFile( (CFile*)handle );
@@ -237,7 +237,7 @@ _SeekProc(fi_handle handle, long offset, int origin)
 }
 
 // ----------------------------------------------------------
-inline long _stdcall
+inline long DLL_CALLCONV
 _TellProc(fi_handle handle)
 {
 	CFile* pFile( (CFile*)handle );
