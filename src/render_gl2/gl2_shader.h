@@ -16,8 +16,10 @@ class GL2Shader
 public:
 	~GL2Shader();
 
-	static GLuint		GetGLHandle( GL2Shader* pShader );
 	static GL2Shader*	CreateShader( const char* sVertProgram, const char* sFragProgram );
+	static GL2Shader*	CreateShaderFromFile( const string& sPath );
+
+	static GLuint		GetGLHandle( GL2Shader* pShader );
 	static void			Bind( GL2Shader* pShader );
 	static void			Unbind();
 	static GL2Shader*	GetActive()							{	return s_pCurShader;				}

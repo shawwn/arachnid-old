@@ -198,6 +198,7 @@ CGL2Renderer_impl::OnRedraw()
 	MMat4x4 modelViewProjMat;
 	modelViewProjMat = (cCam.GetProjMat() * cCam.GetViewMat());
 
+	glClearColor( 0.2F, 0.2F, 0.2F, 0.0F );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 	glEnable( GL_DEPTH_TEST );
 	glDepthFunc( GL_LEQUAL );
@@ -207,8 +208,10 @@ CGL2Renderer_impl::OnRedraw()
 	GL2Framebuffer::Bind( g_pRenderer->pFBScreen );
 	GL2Shader::Bind( g_pRenderer->pTestShader );
 	{
+		// setup the shader.
 		GL2Shader* pShader = g_pRenderer->pTestShader;
 		pShader->SetEngineParam4x4fv( GL2Shader::EP_MODEL_VIEW_PROJECTION_MATRIX, modelViewProjMat.GetData() );
+		GL2Texture2D::Bind( GL2_TEX_DIFFUSE, g_pRenderer->pTestTex );
 
 		g_pRenderer->pTestShader->SetEngineParam4x4fv( GL2Shader::EP_MODEL_VIEW_PROJECTION_MATRIX, modelViewProjMat.GetData() );
 
@@ -316,7 +319,7 @@ CGL2Renderer::Startup( PxU32 uiScreenW, PxU32 uiScreenH )
 		m.pTestMesh = EdMesh::LoadFromFile( FileManager.OpenFile("/media/props/human_head/human_head.obj" ) );
 
 		// shader.
-		m.pTestShader = GL2Shader::CreateShader( "", "" );
+		m.pTestShader = GL2Shader::CreateShaderFromFile( "/media/system/shaders/textured" );
 	}
 
 	return true;
@@ -360,7 +363,7 @@ void
 CGL2Renderer::Frame( PxU32 uiTotalTime, PxF32 fDeltaTime )
 {
 	E_UNREF_PARAM2( uiTotalTime, fDeltaTime );
-	printf( "clock: %d\t\tdt: %f\n", uiTotalTime, fDeltaTime );
+	//printf( "clock: %d\t\tdt: %f\n", uiTotalTime, fDeltaTime );
 	glutMainLoopEvent();
 }
 
@@ -396,14 +399,14 @@ DrawMesh( NVSHARE::MeshSystem* ms )
 				MeshVertex* v1 = &m->mVertices[ i1 ];
 				MeshVertex* v2 = &m->mVertices[ i2 ];
 
-#if 1
+#if 0
 				glTexCoord2fv( v0->mTexel1 ); glVertex3fv( v0->mPos );
 				glTexCoord2fv( v1->mTexel1 ); glVertex3fv( v1->mPos );
 				glTexCoord2fv( v2->mTexel1 ); glVertex3fv( v2->mPos );
 #else
-				glVertexAttrib2fv( GR_ATTRIB_TEXCOORD_INDEX, v0->mTexel1 ); glVertexAttrib3fv( GR_ATTRIB_POSITION_INDEX, v0->mPos );
-				glVertexAttrib2fv( GR_ATTRIB_TEXCOORD_INDEX, v1->mTexel1 ); glVertexAttrib3fv( GR_ATTRIB_POSITION_INDEX, v1->mPos );
-				glVertexAttrib2fv( GR_ATTRIB_TEXCOORD_INDEX, v2->mTexel1 ); glVertexAttrib3fv( GR_ATTRIB_POSITION_INDEX, v2->mPos );
+				glVertexAttrib2fv( GL2_ATTRIB_TEXCOORD_INDEX, v0->mTexel1 ); glVertexAttrib3fv( GL2_ATTRIB_POSITION_INDEX, v0->mPos );
+				glVertexAttrib2fv( GL2_ATTRIB_TEXCOORD_INDEX, v1->mTexel1 ); glVertexAttrib3fv( GL2_ATTRIB_POSITION_INDEX, v1->mPos );
+				glVertexAttrib2fv( GL2_ATTRIB_TEXCOORD_INDEX, v2->mTexel1 ); glVertexAttrib3fv( GL2_ATTRIB_POSITION_INDEX, v2->mPos );
 #endif
 			}
 		}

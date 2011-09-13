@@ -1,8 +1,15 @@
 #include "render_gl2_afx.h"
 #include "gl2_shader.h"
 
+// math headers.
 #include "common/m_vec3.h"
 
+// engine headers.
+#include "engine/c_filemanager.h"
+
+//***************************************************************************
+// Definitions
+//***************************************************************************
 GL2Shader* GL2Shader::s_pCurShader;
 
 //***************************************************************************
@@ -52,7 +59,7 @@ public:
 	GL2Shader_impl();
 
 	// clears our state to be equal to freshly-constructed.  Deletes our program and shaders.
-	void			Reset();
+	void			Reset( bool bClearErrorLogs = true );
 
 	// compiles and links the shader.  If there are any compilation errors,
 	// it 1) fetches the logs; 2) deletes the old shader; 3) compiles and
@@ -99,15 +106,18 @@ GL2Shader_impl::GL2Shader_impl()
 
 //---------------------------------------------------------------------------
 void
-GL2Shader_impl::Reset()
+GL2Shader_impl::Reset( bool bClearErrorLogs )
 {
 	// clear our 'failed' state.
 	bFailed = false;
 
-	// clear any error logs.
-	sProgramLog.clear();
-	sFragShaderLog.clear();
-	sVertShaderLog.clear();
+	if ( bClearErrorLogs )
+	{
+		// clear any error logs.
+		sProgramLog.clear();
+		sFragShaderLog.clear();
+		sVertShaderLog.clear();
+	}
 
 	// delete our old program, if any.
 	DeleteProgram( hProgram, hFragShader, hVertShader );
@@ -161,8 +171,8 @@ GL2Shader_impl::BuildFromSource(  const char* sVertShader, const char* sFragShad
 
 	// delete the failed shader, and return the error shader.
 	{
-		// clear any previous state.
-		Reset();
+		// clear any previous state, except error logs.
+		Reset( false );
 
 		// build and link the error shader.
 		BuildProgram( hProgram, hVertShader, hFragShader,
@@ -172,6 +182,9 @@ GL2Shader_impl::BuildFromSource(  const char* sVertShader, const char* sFragShad
 
 	// indicate that it's an error shader.
 	bFailed = true;
+
+	// print the error log.
+	printf("\nShader failed to build:\n%s\n%s\n%s\n", sVertShaderLog.c_str(), sFragShaderLog.c_str(), sProgramLog.c_str() ); 
 }
 
 //---------------------------------------------------------------------------
@@ -338,16 +351,6 @@ GL2Shader::~GL2Shader()
 }
 
 //---------------------------------------------------------------------------
-GLuint
-GL2Shader::GetGLHandle( GL2Shader* pShader )
-{
-	if ( pShader == NULL )
-		return NULL_GL_HANDLE;
-
-	return pShader->m.hProgram;
-}
-
-//---------------------------------------------------------------------------
 GL2Shader*
 GL2Shader::CreateShader( const char* sVertShader, const char* sFragShader )
 {
@@ -363,14 +366,6 @@ GL2Shader::CreateShader( const char* sVertShader, const char* sFragShader )
 
 	// initialize the shader. 
 	{
-		// bind the vertex attributes to the shader.
-		glBindAttribLocation( pShader->m.hProgram,	GL2_ATTRIB_POSITION_INDEX,	GL2_ATTRIB_POSITION_NAME );
-		glBindAttribLocation( pShader->m.hProgram,	GL2_ATTRIB_TANGENT_INDEX,	GL2_ATTRIB_TANGENT_NAME );
-		glBindAttribLocation( pShader->m.hProgram,	GL2_ATTRIB_BINORMAL_INDEX,	GL2_ATTRIB_BINORMAL_NAME );
-		glBindAttribLocation( pShader->m.hProgram,	GL2_ATTRIB_NORMAL_INDEX,	GL2_ATTRIB_NORMAL_NAME );
-		glBindAttribLocation( pShader->m.hProgram,	GL2_ATTRIB_TEXCOORD_INDEX,	GL2_ATTRIB_TEXCOORD_NAME );
-		glBindAttribLocation( pShader->m.hProgram,	GL2_ATTRIB_COLOR_INDEX,		GL2_ATTRIB_COLOR_NAME );
-
 		// fetch uniform locations.
 		pShader->m.InitParams();
 	}
@@ -378,6 +373,43 @@ GL2Shader::CreateShader( const char* sVertShader, const char* sFragShader )
 
 	// we're done, so return the shader.
 	return pShader;
+}
+
+//---------------------------------------------------------------------------
+GL2Shader*
+GL2Shader::CreateShaderFromFile( const string& sPath )
+{
+	printf( "Loading shader '%s'...\n", sPath.c_str() ); 
+	// an example of 'sPath' might be:
+	//
+	//	/media/system/shaders/textured
+	//
+
+	// load the source code.
+	CFileHandle hVertProgram( FileManager.OpenFile(sPath + ".vsh") );
+	CFileHandle hFragProgram( FileManager.OpenFile(sPath + ".fsh") );
+
+	// if either of them failed, then abort.
+	if ( !hVertProgram.IsOpen() || !hFragProgram.IsOpen() )
+	{
+		printf( "Failed to locate shaders at '%s'\n", sPath.c_str() ); 
+		E_ASSERT( !"Failed to locate shader on disk." );
+		return NULL;
+	}
+
+	// build a shader from the file data.  (Note that the filesystem
+	// automatically null-terminates the file data for us.)
+	return CreateShader( hVertProgram.GetFileMem(), hFragProgram.GetFileMem() );
+}
+
+//---------------------------------------------------------------------------
+GLuint
+GL2Shader::GetGLHandle( GL2Shader* pShader )
+{
+	if ( pShader == NULL )
+		return NULL_GL_HANDLE;
+
+	return pShader->m.hProgram;
 }
 
 //---------------------------------------------------------------------------
@@ -489,10 +521,21 @@ BuildProgram( GLuint& hProgram, GLuint& hVertShader, GLuint& hFragShader,
 
 	if ( WasCompileSuccessful(hVertShader) && WasCompileSuccessful(hFragShader) )
 	{
-		// link the shaders.
+		// attach the shaders.
 		glAttachShader( hProgram, hVertShader );
 		glAttachShader( hProgram, hFragShader );
+
+		// bind the vertex attributes.
+		glBindAttribLocation( hProgram,	GL2_ATTRIB_POSITION_INDEX,	GL2_ATTRIB_POSITION_NAME );
+		glBindAttribLocation( hProgram,	GL2_ATTRIB_TANGENT_INDEX,	GL2_ATTRIB_TANGENT_NAME );
+		glBindAttribLocation( hProgram,	GL2_ATTRIB_BINORMAL_INDEX,	GL2_ATTRIB_BINORMAL_NAME );
+		glBindAttribLocation( hProgram,	GL2_ATTRIB_NORMAL_INDEX,	GL2_ATTRIB_NORMAL_NAME );
+		glBindAttribLocation( hProgram,	GL2_ATTRIB_TEXCOORD_INDEX,	GL2_ATTRIB_TEXCOORD_NAME );
+		glBindAttribLocation( hProgram,	GL2_ATTRIB_COLOR_INDEX,		GL2_ATTRIB_COLOR_NAME );
+
+		// link the program.
 		glLinkProgram( hProgram );
+
 		CHECK_GL();
 	}
 }
