@@ -203,6 +203,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\render_gl2\gl2_renderbuffer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\render_gl2\gl2_renderbuffer.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\render_gl2\gl2_renderer.cpp"
 				>
 			</File>

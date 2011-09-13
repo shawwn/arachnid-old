@@ -140,6 +140,10 @@ Name="render_gl2"
     </File>
     <File RelativePath="..\..\src\render_gl2\gl2_util.h">
     </File>
+    <File RelativePath="..\..\src\render_gl2\gr_renderbuffer.cpp">
+    </File>
+    <File RelativePath="..\..\src\render_gl2\gr_renderbuffer.h">
+    </File>
     <File RelativePath="..\..\src\render_gl2\render_gl2_afx.cpp">
       <FileConfiguration Name="debug|Win32">
         <Tool Name="VCCLCompilerTool" UsePrecompiledHeader="1" />

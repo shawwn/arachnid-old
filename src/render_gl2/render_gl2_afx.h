@@ -4,8 +4,6 @@
 // Precompiled GL2Renderer headers.
 //***************************************************************************
 #include "engine/engine_afx.h"
-#include "render_gl2/gl2_config.h"
-#include "render_gl2/gl2_types.h"
 
 // precompile the GL headers (thus requiring windows.h).
 #ifdef WIN32
@@ -24,11 +22,24 @@
 #include <GL/wglext.h>
 #endif
 
+// precompile our renderer headers.
+#include "render_gl2/gl2_config.h"
+#include "render_gl2/gl2_types.h"
+
+//***************************************************************************
+// Declarations
+//***************************************************************************
+
+// rather than passing 0 to GL functions, represent a "NULL GL handle" for clarity.
+const GLuint	NULL_GL_HANDLE(0);
+
 //***************************************************************************
 // Utilities
 //***************************************************************************
+extern void	_DbgCheckGL( const char* file, long line );
+
 #ifdef _DEBUG
- #if 0
+ #if 1
   #define CHECK_GL()		_DbgCheckGL( __FILE__, __LINE__ )
  #else
   #define CHECK_GL()

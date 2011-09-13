@@ -2,10 +2,47 @@
 
 enum ETextureType
 {
-	TEXTYPE_1D,
-	TEXTYPE_2D,
-	TEXTYPE_3D,
-	TEXTYPE_CUBE,
+	GL2_TEXTYPE_1D,
+	GL2_TEXTYPE_2D,
+	GL2_TEXTYPE_3D,
+	GL2_TEXTYPE_CUBE,
+	GL2_TEXTYPE_RENDERBUFFER,
 
-	TEXTYPE_MAX
+	GL2_TEXTYPES_COUNT,
+
+	GL2_TEXTYPE_INVALID			= -1,
+	FORCE_DWORD_GL2_TEXTYPES	= 0x7FFFFFFF,
 };
+
+enum EFramebufferAttachmentType
+{
+	GL2_ATTACH_COLOR0,
+	GL2_ATTACH_COLOR1,
+	GL2_ATTACH_COLOR2,
+	GL2_ATTACH_COLOR3,
+	GL2_ATTACH_DEPTH,
+	GL2_ATTACH_STENCIL,
+
+	GL2_ATTACHMENTS_COUNT,
+
+	GL2_ATTACH_INVALID		= -1,
+	FORCE_DWORD_GL2_ATTACH	= 0x7FFFFFFF,
+};
+
+//---------------------------------------------------------------------------
+E_INLINE EFramebufferAttachmentType
+GLAttachType_to_FramebufferAttachType( GLenum gl_eAttach )
+{
+	switch ( gl_eAttach )
+	{
+	case GL_COLOR_ATTACHMENT0:	return GL2_ATTACH_COLOR0;
+	case GL_COLOR_ATTACHMENT1:	return GL2_ATTACH_COLOR1;
+	case GL_COLOR_ATTACHMENT2:	return GL2_ATTACH_COLOR2;
+	case GL_COLOR_ATTACHMENT3:	return GL2_ATTACH_COLOR3;
+	case GL_DEPTH_ATTACHMENT:	return GL2_ATTACH_DEPTH;
+	case GL_STENCIL_ATTACHMENT:	return GL2_ATTACH_STENCIL;
+	}
+
+	E_ASSERT( !"Invalid GL attachment type" );
+	return GL2_ATTACH_INVALID;
+}

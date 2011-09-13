@@ -32,15 +32,50 @@ GL2Texture2D::LoadFromImage( GrImage* pImage )
 	CHECK_GL();
 
 	// return the texture.
-	GL2Texture2D* pRet = E_NEW(GL2Texture2D);
-	pRet->m_uiHandle = gl;
+	GL2Texture2D* pRet		= E_NEW(GL2Texture2D);
+	pRet->m_hGLHandle			= gl;
+	pRet->m_uiMiplevels		= 1;
+	pRet->m_uiWidth			= pImage->GetWidth();
+	pRet->m_uiHeight		= pImage->GetHeight();
+	return pRet;
+}
+
+//---------------------------------------------------------------------------
+GL2Texture2D*
+GL2Texture2D::CreateTexture2D( GLenum glInternalFormat, // GL_RGBA8 etc
+							  GLenum glFormat, // GL_BGRA etc
+							  GLenum glType, // GL_UNSIGNED_BYTE or GL_FLOAT, probably.
+							  PxU32 uiWidth, PxU32 uiHeight )
+{
+	// allocate a GL texture, loading the image into it.
+	GLuint handle = 0;
+	glGenTextures(1, &handle);
+	glBindTexture(GL_TEXTURE_2D, handle);
+	{
+		GLint uiMiplevel = 0;
+		glTexImage2D( GL_TEXTURE_2D, uiMiplevel, glInternalFormat, uiWidth, uiHeight,
+			0, glFormat, glType, NULL );
+	}
+
+	// verify GL is okay.
+	CHECK_GL();
+
+	// return the texture.
+	GL2Texture2D* pRet		= E_NEW(GL2Texture2D);
+	pRet->m_hGLHandle		= handle;
+	pRet->m_uiMiplevels		= 1;
+	pRet->m_uiWidth			= uiWidth;
+	pRet->m_uiHeight		= uiHeight;
 	return pRet;
 }
 
 //---------------------------------------------------------------------------
 GL2Texture2D::GL2Texture2D()
-: GL2TextureBase( TEXTYPE_2D )
-, m_uiHandle( 0 )
+: GL2TextureBase( GL2_TEXTYPE_2D )
+, m_hGLHandle( 0 )
+, m_uiMiplevels( 0 )
+, m_uiWidth( 0 )
+, m_uiHeight( 0 )
 {
 }
 
@@ -51,18 +86,61 @@ GL2Texture2D::~GL2Texture2D()
 
 //---------------------------------------------------------------------------
 void
-GL2Texture2D::Bind( PxU32 uiTexUnit )
+GL2Texture2D::Bind( PxU32 uiTexUnit, GL2TextureBase* pTexBase )
 {
-	E_UNREF_PARAM( uiTexUnit );
-
+	// sanity check the texunit.
 	E_ASSERT( uiTexUnit < 16 );
-	//glActiveTexture( GL_TEXTURE0 + uiTexUnit );
-	glBindTexture( GL_TEXTURE_2D, GetGLHandle() );
+	uiTexUnit = Min(16U, uiTexUnit);
 
-	// hardcode linear filtering for now.
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	if ( !pTexBase )
+	{
+		// unbind the texture.
+		glActiveTexture( GL_TEXTURE0 + uiTexUnit );
+		glBindTexture( GL_RENDERBUFFER, 0 );
+	}
+	else
+	{
+		// sanity check the texture type.
+		E_ASSERT( pTexBase->GetType() == GL2_TEXTYPE_2D );
+		if ( pTexBase->GetType() != GL2_TEXTYPE_2D )
+			return;
+
+		// bind the 2D texture.
+		GL2Texture2D* pTexture2D = (GL2Texture2D*)pTexBase;
+		glActiveTexture( GL_TEXTURE0 + uiTexUnit );
+		glBindTexture( GL_TEXTURE_2D, pTexture2D->GetGLHandle() );
+
+		// hardcode linear filtering for now.
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	}
 
 	// verify GL is okay.
 	CHECK_GL();
+}
+
+//---------------------------------------------------------------------------
+void
+GL2Texture2D::Unbind( PxU32 uiTexUnit )
+{
+	// activate the specified texunit.
+	E_ASSERT( uiTexUnit < 16 );
+	uiTexUnit = Min(16U, uiTexUnit);
+	glActiveTexture( GL_TEXTURE0 + uiTexUnit );
+}
+
+//---------------------------------------------------------------------------
+void
+GL2Texture2D::DrawFullscreen( PxF32 fL, PxF32 fR, PxF32 fB, PxF32 fT )
+{
+	GL2Texture2D::Bind( GR_TEXUNIT(0), this );
+
+	glBegin( GL_QUADS );
+	{
+		glTexCoord2f( 0.0F, 0.0F );  glVertex2f( fL, fB );
+		glTexCoord2f( 0.0F, 1.0F );  glVertex2f( fL, fT );
+		glTexCoord2f( 1.0F, 1.0F );  glVertex2f( fR, fT );
+		glTexCoord2f( 1.0F, 0.0F );  glVertex2f( fR, fB );
+	}
+	glEnd();
 }

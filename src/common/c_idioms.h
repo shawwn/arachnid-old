@@ -8,9 +8,10 @@
 #define E_ASSERT(x)		assert(x)
 
 // unreferenced parameter.
-#define E_UNREF_PARAM( x )			( (void)(x) )
-#define E_UNREF_PARAM2( x, y )		( E_UNREF_PARAM( x ), E_UNREF_PARAM( y ) )
-#define E_UNREF_PARAM3( x, y, z )	( E_UNREF_PARAM( x ), E_UNREF_PARAM( y ), E_UNREF_PARAM( z ) )
+#define E_UNREF_PARAM( x )				( (void)(x) )
+#define E_UNREF_PARAM2( x, y )			( E_UNREF_PARAM( x ), E_UNREF_PARAM( y ) )
+#define E_UNREF_PARAM3( x, y, z )		( E_UNREF_PARAM( x ), E_UNREF_PARAM( y ), E_UNREF_PARAM( z ) )
+#define E_UNREF_PARAM4( x, y, z, w )	( E_UNREF_PARAM( x ), E_UNREF_PARAM( y ), E_UNREF_PARAM( z ), E_UNREF_PARAM( w ) )
 
 // define NULL value.
 #ifndef NULL

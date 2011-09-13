@@ -17,13 +17,15 @@
 // UI headers.
 #include "AntTweakBar.h"
 
-// gl2 headers.
-#include "gl2_texture2d.h"
-
 // EditLib headers.
 #include "editutil/editutil.h"
 #include "editutil/ed_mesh.h"
 #include "MeshImport/MeshImport.h"
+
+// gl2 headers.
+#include "gl2_texture2d.h"
+#include "gl2_framebuffer.h"
+#include "gl2_renderbuffer.h"
 
 //***************************************************************************
 // Declarations
@@ -40,33 +42,53 @@ public:
 	~CGL2Renderer_impl();
 
 	// Freeglut callback functions.
-	static bool				TryStartupGL( PxU32 uiScreenW, PxU32 uiScreenH );
-	static void				BindGlutCallbacks();
+	bool					TryStartupGL( PxU32 uiScreenW, PxU32 uiScreenH );
 	static void				OnRedraw();
 	static void				OnClose();
 	static void				OnKeyDown( unsigned char c, int, int );
 	static void				OnKeyUp( unsigned char c, int, int );
 
-	CGL2Renderer*			pRenderer;
 	PxU32					uiScreenW;
 	PxU32					uiScreenH;
-	GrImage*				pTestImage;
+
+	GL2Framebuffer*			pFBScreen;
+	GL2Texture2D*			pRBScreenColor;
+	GL2Renderbuffer*		pRBScreenDepth;
+
 	GL2Texture2D*			pTestTex;
-	EdMesh*					pMesh;
+	EdMesh*					pTestMesh;
 };
 
-// our instance.
+// our singleton.
 static CGL2Renderer_impl*	g_pRenderer;
 
 
 //---------------------------------------------------------------------------
 CGL2Renderer_impl::CGL2Renderer_impl()
-: pRenderer( NULL )
-, uiScreenW( 512 )
-, uiScreenH( 512 )
+: uiScreenW( 0 )
+, uiScreenH( 0 )
+, pFBScreen( NULL )
+, pRBScreenColor( NULL )
+, pRBScreenDepth( NULL )
+, pTestTex( NULL )
+, pTestMesh( NULL )
 {
 	E_ASSERT( g_pRenderer == NULL );
 	g_pRenderer = this;
+}
+
+//---------------------------------------------------------------------------
+CGL2Renderer_impl::~CGL2Renderer_impl()
+{
+	E_DELETE( pTestMesh );
+	E_DELETE( pTestTex );
+
+	E_DELETE( pFBScreen );
+	E_DELETE( pRBScreenDepth );
+	E_DELETE( pRBScreenColor );
+
+	E_ASSERT( g_pRenderer == this );
+	g_pRenderer = NULL;
 }
 
 //---------------------------------------------------------------------------
@@ -82,6 +104,12 @@ CGL2Renderer_impl::TryStartupGL( PxU32 uiScreenW, PxU32 uiScreenH )
 	glutInitWindowSize( uiScreenW, uiScreenH );
 	glutSetOption( GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_CONTINUE_EXECUTION );
 	glutCreateWindow( "Arachnid" );
+
+	// bind freeglut callbacks.
+	glutDisplayFunc( OnRedraw );
+	glutCloseFunc( OnClose );
+	glutKeyboardFunc( OnKeyDown );
+	glutKeyboardUpFunc( OnKeyUp );
 
 	// initialize GLEW.
 	{
@@ -130,11 +158,20 @@ CGL2Renderer_impl::TryStartupGL( PxU32 uiScreenW, PxU32 uiScreenH )
 #endif
 	}
 
-	// register freeglut callbacks.
-	CGL2Renderer_impl::BindGlutCallbacks();
+	// ensure GL is okay.
+	CHECK_GL();
 
-	g_pRenderer->uiScreenW = uiScreenW;
-	g_pRenderer->uiScreenH = uiScreenH;
+	// create our framebuffers.
+	{
+		pFBScreen = GL2Framebuffer::CreateFramebuffer( uiScreenW, uiScreenH );
+		pRBScreenColor = GL2Texture2D::CreateTexture2D( GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, uiScreenW, uiScreenH );
+		pRBScreenDepth = GL2Renderbuffer::CreateRenderbuffer( GL_DEPTH_COMPONENT24, uiScreenW, uiScreenH );
+		pFBScreen->Attach( GL2FramebufferAttachment( GL_COLOR_ATTACHMENT0, GL2_TEXTYPE_2D, pRBScreenColor ) );
+		pFBScreen->Attach( GL2FramebufferAttachment( GL_DEPTH_ATTACHMENT,  GL2_TEXTYPE_RENDERBUFFER, pRBScreenDepth ) );
+	}
+
+	this->uiScreenW = uiScreenW;
+	this->uiScreenH = uiScreenH;
 	return true;
 }
 
@@ -142,32 +179,40 @@ CGL2Renderer_impl::TryStartupGL( PxU32 uiScreenW, PxU32 uiScreenH )
 void
 CGL2Renderer_impl::OnRedraw()
 {
+	if ( !g_pRenderer )
+		return;
+
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 
 	glEnable( GL_DEPTH_TEST );
 	glDepthFunc( GL_LEQUAL );
 
 	glEnable( GL_TEXTURE_2D );
-	g_pRenderer->pTestTex->Bind(0);
 
-#if 1
+	// render to texture.
+	GL2Framebuffer::Bind( g_pRenderer->pFBScreen );
+	glViewport( 0, 0, g_pRenderer->uiScreenW, g_pRenderer->uiScreenH );
 	{
-		// render the mesh.
-		NVSHARE::MeshSystem* pMeshSystem = NULL;
-		if ( g_pRenderer && g_pRenderer->pMesh )
-			pMeshSystem = g_pRenderer->pMesh->GetMesh();
-		DrawMesh( pMeshSystem );
+		// bind texture.
+		GL2Texture2D::Bind( GR_TEXUNIT(0), g_pRenderer->pTestTex );
+
+		// render mesh.
+		EdMesh* pMesh = g_pRenderer->pTestMesh;
+		DrawMesh( pMesh ? pMesh->GetMesh() : NULL );
 	}
-#else
-	glBegin( GL_QUADS );
+	CHECK_GL();
+
+	// render to screen, sourcing from that texture.
+	GL2Framebuffer::Unbind();
+	glViewport( 0, 0, g_pRenderer->uiScreenW, g_pRenderer->uiScreenH );
 	{
-		glTexCoord2f( 0.0F, 0.0F );  glVertex2f( -1.0F, -1.0F );
-		glTexCoord2f( 0.0F, 1.0F );  glVertex2f( -1.0F,  1.0F );
-		glTexCoord2f( 1.0F, 1.0F );  glVertex2f(  1.0F,  1.0F );
-		glTexCoord2f( 1.0F, 0.0F );  glVertex2f(  1.0F, -1.0F );
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		g_pRenderer->pRBScreenColor->DrawFullscreen();
 	}
-	glEnd();
-#endif
+	CHECK_GL();
 
 	glutSwapBuffers();
 	glutPostRedisplay();
@@ -195,25 +240,6 @@ CGL2Renderer_impl::OnKeyUp( unsigned char c, int, int )
 	E_UNREF_PARAM(c);
 }
 
-//---------------------------------------------------------------------------
-void
-CGL2Renderer_impl::BindGlutCallbacks()
-{
-	glutDisplayFunc( OnRedraw );
-	glutCloseFunc( OnClose );
-	glutKeyboardFunc( OnKeyDown );
-	glutKeyboardUpFunc( OnKeyUp );
-}
-
-//---------------------------------------------------------------------------
-CGL2Renderer_impl::~CGL2Renderer_impl()
-{
-	E_DELETE( pTestImage );
-
-	E_ASSERT( g_pRenderer == this );
-	g_pRenderer = NULL;
-}
-
 //===========================================================================
 // GL2Renderer
 //===========================================================================
@@ -228,7 +254,6 @@ CGL2Renderer::~CGL2Renderer()
 CGL2Renderer::CGL2Renderer()
 : E_IMPL_NEW( CGL2Renderer )
 {
-	 m.pRenderer = this;
 }
 
 //---------------------------------------------------------------------------
@@ -262,14 +287,14 @@ CGL2Renderer::Startup( PxU32 uiScreenW, PxU32 uiScreenH )
 	{
 		// textures.
 		{
-			m.pTestImage = GrImage::LoadImageFromFile( FileManager.OpenFile("/media/props/human_head/human_head_d.jpg") );
-			m.pTestTex = GL2Texture2D::LoadFromImage( m.pTestImage );
-			m.pTestTex->Bind(0);
+			GrImage* pTestImage = GrImage::LoadImageFromFile( FileManager.OpenFile("/media/props/human_head/human_head_d.jpg") );
+			m.pTestTex = GL2Texture2D::LoadFromImage( pTestImage );
+			E_DELETE( pTestImage );
 		}
 
 		// mesh.
 		{
-			m.pMesh = EdMesh::LoadFromFile( FileManager.OpenFile("/media/props/human_head/human_head.obj" ) );
+			m.pTestMesh = EdMesh::LoadFromFile( FileManager.OpenFile("/media/props/human_head/human_head.obj" ) );
 		}
 	}
 
@@ -281,8 +306,7 @@ void
 CGL2Renderer::Shutdown()
 {
 	// free test assets.
-	E_DELETE( m.pMesh );
-	E_DELETE( m.pTestImage );
+	E_DELETE( m.pTestMesh );
 	E_DELETE( m.pTestTex );
 
 	// shutdown EditLib.
