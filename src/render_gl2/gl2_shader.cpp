@@ -145,7 +145,14 @@ GL2Shader_impl::BuildFromSource(  const char* sVertShader, const char* sFragShad
 
 	// have we successfully linked?  If so, then we're done!
 	if ( WasLinkSuccessful(hProgram) )
+	{
+		// on second thought, print out the program log.
+		GetShaderLog( sVertShaderLog, hVertShader );
+		GetShaderLog( sFragShaderLog, hFragShader );
+			GetProgramLog( sProgramLog, hProgram );
+		printf("\nShader successfully built:\n%s\n%s\n%s\n", sVertShaderLog.c_str(), sFragShaderLog.c_str(), sProgramLog.c_str() ); 
 		return;
+	}
 
 	// determine whether the problem was with the compilation, or the linking phase.
 	{

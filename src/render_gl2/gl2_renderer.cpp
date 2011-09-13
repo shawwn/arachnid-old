@@ -59,7 +59,8 @@ public:
 	GL2Texture2D*			pRBScreenColor;
 	GL2Renderbuffer*		pRBScreenDepth;
 
-	GL2Texture2D*			pTestTex;
+	GL2Texture2D*			pTestDiffuseMap;
+	GL2Texture2D*			pTestNormalMap;
 	EdMesh*					pTestMesh;
 	GL2Shader*				pTestShader;
 
@@ -77,7 +78,8 @@ CGL2Renderer_impl::CGL2Renderer_impl()
 , pFBScreen( NULL )
 , pRBScreenColor( NULL )
 , pRBScreenDepth( NULL )
-, pTestTex( NULL )
+, pTestDiffuseMap( NULL )
+, pTestNormalMap( NULL )
 , pTestMesh( NULL )
 , pTestShader( NULL )
 {
@@ -90,7 +92,8 @@ CGL2Renderer_impl::~CGL2Renderer_impl()
 {
 	E_DELETE( pTestShader );
 	E_DELETE( pTestMesh );
-	E_DELETE( pTestTex );
+	E_DELETE( pTestDiffuseMap );
+	E_DELETE( pTestNormalMap );
 
 	E_DELETE( pFBScreen );
 	E_DELETE( pRBScreenDepth );
@@ -194,10 +197,6 @@ CGL2Renderer_impl::OnRedraw()
 	// current camera viewpoint.
 	GrCamera& cCam( g_pRenderer->cCamera );
 
-	// current ModelViewProj matrix.
-	MMat4x4 modelViewProjMat;
-	modelViewProjMat = (cCam.GetProjMat() * cCam.GetViewMat());
-
 	glClearColor( 0.2F, 0.2F, 0.2F, 0.0F );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 	glEnable( GL_DEPTH_TEST );
@@ -210,13 +209,28 @@ CGL2Renderer_impl::OnRedraw()
 	{
 		// setup the shader.
 		GL2Shader* pShader = g_pRenderer->pTestShader;
-		pShader->SetEngineParam4x4fv( GL2Shader::EP_MODEL_VIEW_PROJECTION_MATRIX, modelViewProjMat.GetData() );
-		GL2Texture2D::Bind( GL2_TEX_DIFFUSE, g_pRenderer->pTestTex );
+		{
+			// camera.
+			{
+				// worldviewproj matrix.
+				MMat4x4 wvp( cCam.GetProjMat() * cCam.GetViewMat() );
+				pShader->SetEngineParam4x4fv( GL2Shader::EP_MODEL_VIEW_PROJECTION_MATRIX, wvp.GetData() );
 
-		g_pRenderer->pTestShader->SetEngineParam4x4fv( GL2Shader::EP_MODEL_VIEW_PROJECTION_MATRIX, modelViewProjMat.GetData() );
+				// view position.
+				pShader->SetEngineParam4fv( GL2Shader::EP_VIEW_POS, cCam.GetPos() );
+			}
 
-		// bind texture.
-		GL2Texture2D::Bind( GL2_TEXUNIT(0), g_pRenderer->pTestTex );
+			// light position.
+			{
+				MVec3 lightPos( cCam.GetPos() );
+				lightPos.SetX( 0.0F );
+				pShader->SetEngineParam4fv( GL2Shader::EP_LIGHT_POS, lightPos );
+			}
+
+			// textures.
+			GL2Texture2D::Bind( GL2_TEX_DIFFUSE, g_pRenderer->pTestDiffuseMap );
+			GL2Texture2D::Bind( GL2_TEX_NORMAL, g_pRenderer->pTestNormalMap );
+		}
 
 		// render mesh.
 		EdMesh* pMesh = g_pRenderer->pTestMesh;
@@ -308,10 +322,17 @@ CGL2Renderer::Startup( PxU32 uiScreenW, PxU32 uiScreenH )
 
 	// load test assets.
 	{
-		// diffuse texture.
+		// diffuse map.
 		{
 			GrImage* pTestImage = GrImage::LoadImageFromFile( FileManager.OpenFile("/media/props/human_head/human_head_d.jpg") );
-			m.pTestTex = GL2Texture2D::LoadFromImage( pTestImage );
+			m.pTestDiffuseMap = GL2Texture2D::LoadFromImage( pTestImage );
+			E_DELETE( pTestImage );
+		}
+
+		// normal map.
+		{
+			GrImage* pTestImage = GrImage::LoadImageFromFile( FileManager.OpenFile("/media/props/human_head/human_head_n.jpg") );
+			m.pTestNormalMap = GL2Texture2D::LoadFromImage( pTestImage );
 			E_DELETE( pTestImage );
 		}
 
@@ -319,7 +340,7 @@ CGL2Renderer::Startup( PxU32 uiScreenW, PxU32 uiScreenH )
 		m.pTestMesh = EdMesh::LoadFromFile( FileManager.OpenFile("/media/props/human_head/human_head.obj" ) );
 
 		// shader.
-		m.pTestShader = GL2Shader::CreateShaderFromFile( "/media/system/shaders/textured" );
+		m.pTestShader = GL2Shader::CreateShaderFromFile( "/media/system/shaders/torrence_sparrow" );
 	}
 
 	return true;
@@ -330,8 +351,10 @@ void
 CGL2Renderer::Shutdown()
 {
 	// free test assets.
+	E_DELETE( m.pTestShader );
 	E_DELETE( m.pTestMesh );
-	E_DELETE( m.pTestTex );
+	E_DELETE( m.pTestDiffuseMap );
+	E_DELETE( m.pTestNormalMap );
 
 	// shutdown EditLib.
 	Ed_Shutdown();
