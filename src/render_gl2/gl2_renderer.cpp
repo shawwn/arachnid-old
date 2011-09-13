@@ -1,6 +1,9 @@
 #include "render_gl2_afx.h"
 #include "gl2_renderer.h"
 
+// math headers.
+#include "common/m_mat4x4.h"
+
 // engine headers.
 #include "engine/c_system.h"
 #include "engine/c_filemanager.h"
@@ -26,6 +29,7 @@
 #include "gl2_texture2d.h"
 #include "gl2_framebuffer.h"
 #include "gl2_renderbuffer.h"
+#include "gl2_shader.h"
 
 //***************************************************************************
 // Declarations
@@ -57,6 +61,9 @@ public:
 
 	GL2Texture2D*			pTestTex;
 	EdMesh*					pTestMesh;
+	GL2Shader*				pTestShader;
+
+	GrCamera				cCamera;
 };
 
 // our singleton.
@@ -72,6 +79,7 @@ CGL2Renderer_impl::CGL2Renderer_impl()
 , pRBScreenDepth( NULL )
 , pTestTex( NULL )
 , pTestMesh( NULL )
+, pTestShader( NULL )
 {
 	E_ASSERT( g_pRenderer == NULL );
 	g_pRenderer = this;
@@ -80,6 +88,7 @@ CGL2Renderer_impl::CGL2Renderer_impl()
 //---------------------------------------------------------------------------
 CGL2Renderer_impl::~CGL2Renderer_impl()
 {
+	E_DELETE( pTestShader );
 	E_DELETE( pTestMesh );
 	E_DELETE( pTestTex );
 
@@ -182,28 +191,39 @@ CGL2Renderer_impl::OnRedraw()
 	if ( !g_pRenderer )
 		return;
 
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
+	// current camera viewpoint.
+	GrCamera& cCam( g_pRenderer->cCamera );
 
+	// current ModelViewProj matrix.
+	MMat4x4 modelViewProjMat;
+	modelViewProjMat = (cCam.GetProjMat() * cCam.GetViewMat());
+
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 	glEnable( GL_DEPTH_TEST );
 	glDepthFunc( GL_LEQUAL );
-
 	glEnable( GL_TEXTURE_2D );
 
 	// render to texture.
 	GL2Framebuffer::Bind( g_pRenderer->pFBScreen );
-	glViewport( 0, 0, g_pRenderer->uiScreenW, g_pRenderer->uiScreenH );
+	GL2Shader::Bind( g_pRenderer->pTestShader );
 	{
+		GL2Shader* pShader = g_pRenderer->pTestShader;
+		pShader->SetEngineParam4x4fv( GL2Shader::EP_MODEL_VIEW_PROJECTION_MATRIX, modelViewProjMat.GetData() );
+
+		g_pRenderer->pTestShader->SetEngineParam4x4fv( GL2Shader::EP_MODEL_VIEW_PROJECTION_MATRIX, modelViewProjMat.GetData() );
+
 		// bind texture.
-		GL2Texture2D::Bind( GR_TEXUNIT(0), g_pRenderer->pTestTex );
+		GL2Texture2D::Bind( GL2_TEXUNIT(0), g_pRenderer->pTestTex );
 
 		// render mesh.
 		EdMesh* pMesh = g_pRenderer->pTestMesh;
 		DrawMesh( pMesh ? pMesh->GetMesh() : NULL );
 	}
+	GL2Shader::Unbind();
+	GL2Framebuffer::Unbind();
 	CHECK_GL();
 
 	// render to screen, sourcing from that texture.
-	GL2Framebuffer::Unbind();
 	glViewport( 0, 0, g_pRenderer->uiScreenW, g_pRenderer->uiScreenH );
 	{
 		glMatrixMode(GL_PROJECTION);
@@ -285,7 +305,7 @@ CGL2Renderer::Startup( PxU32 uiScreenW, PxU32 uiScreenH )
 
 	// load test assets.
 	{
-		// textures.
+		// diffuse texture.
 		{
 			GrImage* pTestImage = GrImage::LoadImageFromFile( FileManager.OpenFile("/media/props/human_head/human_head_d.jpg") );
 			m.pTestTex = GL2Texture2D::LoadFromImage( pTestImage );
@@ -293,9 +313,10 @@ CGL2Renderer::Startup( PxU32 uiScreenW, PxU32 uiScreenH )
 		}
 
 		// mesh.
-		{
-			m.pTestMesh = EdMesh::LoadFromFile( FileManager.OpenFile("/media/props/human_head/human_head.obj" ) );
-		}
+		m.pTestMesh = EdMesh::LoadFromFile( FileManager.OpenFile("/media/props/human_head/human_head.obj" ) );
+
+		// shader.
+		m.pTestShader = GL2Shader::CreateShader( "", "" );
 	}
 
 	return true;
@@ -327,10 +348,11 @@ CGL2Renderer::Shutdown()
 void
 CGL2Renderer::SetViewpoint( const GrCamera& cCamera )
 {
+	m.cCamera = cCamera;
 	glMatrixMode( GL_PROJECTION );
-	glLoadMatrixf( cCamera.GetProjMat().GetData() );
+	glLoadIdentity();
 	glMatrixMode( GL_MODELVIEW );
-	glLoadMatrixf( cCamera.GetViewMat().GetData() );
+	glLoadIdentity();
 }
 
 //---------------------------------------------------------------------------

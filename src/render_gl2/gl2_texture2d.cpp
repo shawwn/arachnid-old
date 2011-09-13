@@ -133,7 +133,7 @@ GL2Texture2D::Unbind( PxU32 uiTexUnit )
 void
 GL2Texture2D::DrawFullscreen( PxF32 fL, PxF32 fR, PxF32 fB, PxF32 fT )
 {
-	GL2Texture2D::Bind( GR_TEXUNIT(0), this );
+	GL2Texture2D::Bind( GL2_TEXUNIT(0), this );
 
 	glBegin( GL_QUADS );
 	{
