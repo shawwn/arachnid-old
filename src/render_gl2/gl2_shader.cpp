@@ -324,12 +324,8 @@ GL2Shader_impl::InitParams()
 	InitEngineParam( program, GL_FLOAT_VEC4, GL2Shader::EP_LIGHT_POS, GL2_LIGHT_POS_NAME );
 	InitEngineParam( program, GL_FLOAT_VEC4, GL2Shader::EP_LIGHT_COLOR, GL2_LIGHT_COLOR_NAME );
 	InitEngineParam( program, GL_FLOAT_VEC4, GL2Shader::EP_BLUR_DIRECTION, GL2_BLUR_DIRECTION_NAME );
-	InitEngineParam( program, GL_FLOAT_VEC4, GL2Shader::EP_BLUR_WEIGHTS_R, GL2_BLUR_WEIGHTS_R_NAME );
-	InitEngineParam( program, GL_FLOAT_VEC4, GL2Shader::EP_BLUR_WEIGHTS_G, GL2_BLUR_WEIGHTS_G_NAME );
-	InitEngineParam( program, GL_FLOAT_VEC4, GL2Shader::EP_BLUR_WEIGHTS_B, GL2_BLUR_WEIGHTS_B_NAME );
-	InitEngineParam( program, GL_FLOAT_VEC4, GL2Shader::EP_BLUR_OFFSETS_R, GL2_BLUR_OFFSETS_R_NAME );
-	InitEngineParam( program, GL_FLOAT_VEC4, GL2Shader::EP_BLUR_OFFSETS_G, GL2_BLUR_OFFSETS_G_NAME );
-	InitEngineParam( program, GL_FLOAT_VEC4, GL2Shader::EP_BLUR_OFFSETS_B, GL2_BLUR_OFFSETS_B_NAME );
+	InitEngineParam( program, GL_FLOAT_VEC4, GL2Shader::EP_BLUR_WEIGHTS, GL2_BLUR_WEIGHTS_NAME );
+	InitEngineParam( program, GL_FLOAT_VEC4, GL2Shader::EP_BLUR_OFFSETS, GL2_BLUR_OFFSETS_NAME );
 	InitEngineParam( program, GL_FLOAT_VEC4, GL2Shader::EP_BLUR_CENTER_TAP_WEIGHT, GL2_BLUR_CENTER_TAP_WEIGHT_NAME );
 #if 0
 	vUniformLocations[ GL2Shader::EP_DEBUG0 ] = InitEngineParam( program, GL2_DEBUG0_NAME, GL_FLOAT_VEC4 );

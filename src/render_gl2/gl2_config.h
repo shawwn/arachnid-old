@@ -44,12 +44,8 @@
 
 // blurring.
 #define GL2_BLUR_DIRECTION_NAME					"u_BlurDirection"
-#define GL2_BLUR_WEIGHTS_R_NAME					"u_BlurWeightsR"
-#define GL2_BLUR_WEIGHTS_G_NAME					"u_BlurWeightsG"
-#define GL2_BLUR_WEIGHTS_B_NAME					"u_BlurWeightsB"
-#define GL2_BLUR_OFFSETS_R_NAME					"u_BlurOffsetsR"
-#define GL2_BLUR_OFFSETS_G_NAME					"u_BlurOffsetsG"
-#define GL2_BLUR_OFFSETS_B_NAME					"u_BlurOffsetsB"
+#define GL2_BLUR_WEIGHTS_NAME					"u_BlurWeights"
+#define GL2_BLUR_OFFSETS_NAME					"u_BlurOffsets"
 #define GL2_BLUR_CENTER_TAP_WEIGHT_NAME			"u_BlurCenterTapWeight"
 
 // samplers

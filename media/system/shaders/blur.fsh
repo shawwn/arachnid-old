@@ -23,27 +23,15 @@ varying vec2 v_TexCoord;
 #endif
 
 #if (VIRTUAL_TAPS == 3)
-	varying vec2	v_TapsR[3];
-	varying vec2	v_TapsG[3];
-	varying vec2	v_TapsB[3];
+	varying vec2	v_Taps[3];
 #elif (VIRTUAL_TAPS == 5)
-	varying vec2	v_TapsR[4];
-	varying vec2	v_TapsG[4];
-	varying vec2	v_TapsB[4];
+	varying vec2	v_Taps[4];
 #elif (VIRTUAL_TAPS == 7)
-	varying vec2	v_PositiveTapsR[3];
-	varying vec2	v_PositiveTapsG[3];
-	varying vec2	v_PositiveTapsB[3];
-	varying vec2	v_NegativeTapsR[3];
-	varying vec2	v_NegativeTapsG[3];
-	varying vec2	v_NegativeTapsB[3];
+	varying vec2	v_PositiveTaps[3];
+	varying vec2	v_NegativeTaps[3];
 #elif (VIRTUAL_TAPS == 9)
-	varying vec2	v_PositiveTapsR[3];
-	varying vec2	v_PositiveTapsG[3];
-	varying vec2	v_PositiveTapsB[3];
-	varying vec2	v_NegativeTapsR[3];
-	varying vec2	v_NegativeTapsG[3];
-	varying vec2	v_NegativeTapsB[3];
+	varying vec2	v_PositiveTaps[3];
+	varying vec2	v_NegativeTaps[3];
 #endif
 
 //==========================================================
@@ -54,12 +42,8 @@ uniform sampler2DRect	s_CurrentTex;
 //==========================================================
 // uniforms.
 //==========================================================
-uniform vec4 u_BlurWeightsR;
-uniform vec4 u_BlurWeightsG;
-uniform vec4 u_BlurWeightsB;
-uniform vec4 u_BlurOffsetsR;
-uniform vec4 u_BlurOffsetsG;
-uniform vec4 u_BlurOffsetsB;
+uniform vec4 u_BlurWeights;
+uniform vec4 u_BlurOffsets;
 #if VIRTUAL_TAPS != 3
 uniform vec4 u_BlurCenterTapWeight;			// (X,undef,undef,undef)
 #endif
@@ -110,65 +94,34 @@ void main()
 
 #elif 1
 	#if VIRTUAL_TAPS == 3
-		mat3x4 samplesR;
-		mat3x4 samplesG;
-		mat3x4 samplesB;
+		mat3x4 samples;
 	#elif VIRTUAL_TAPS == 5
-		mat4x4 samplesR;
-		mat4x4 samplesG;
-		mat4x4 samplesB;
+		mat4x4 samples;
 	#elif VIRTUAL_TAPS == 7
-		mat3x4 positiveSamplesR;
-		mat3x4 positiveSamplesG;
-		mat3x4 positiveSamplesB;
-		mat3x4 negativeSamplesR;
-		mat3x4 negativeSamplesG;
-		mat3x4 negativeSamplesB;
+		mat3x4 positiveSamples;
+		mat3x4 negativeSamples;
 	#elif VIRTUAL_TAPS == 9
-		mat4x4 positiveSamplesR;
-		mat4x4 positiveSamplesG;
-		mat4x4 positiveSamplesB;
-		mat4x4 negativeSamplesR;
-		mat4x4 negativeSamplesG;
-		mat4x4 negativeSamplesB;
+		mat4x4 positiveSamples;
+		mat4x4 negativeSamples;
 	#endif
 
 	for(int i=0; i<LOOPS; i++)
 	{
 		#if VIRTUAL_TAPS == 3 || VIRTUAL_TAPS == 5
-			samplesR[i]				= tap1( v_TapsR[i] );
-			samplesG[i]				= tap1( v_TapsG[i] );
-			samplesB[i]				= tap1( v_TapsB[i] );
+			samples[i]				= tap1( v_Taps[i] );
 		#elif VIRTUAL_TAPS == 7
-			positiveSamplesR[i]		= tap1( v_PositiveTapsR[i] );
-			positiveSamplesG[i]		= tap1( v_PositiveTapsG[i] );
-			positiveSamplesB[i]		= tap1( v_PositiveTapsB[i] );
-			negativeSamplesR[i]		= tap1( v_NegativeTapsR[i] );
-			negativeSamplesG[i]		= tap1( v_NegativeTapsG[i] );
-			negativeSamplesB[i]		= tap1( v_NegativeTapsB[i] );
+			positiveSamples[i]		= tap1( v_PositiveTaps[i] );
+			negativeSamples[i]		= tap1( v_NegativeTaps[i] );
 		#elif VIRTUAL_TAPS == 9
-			positiveSamplesR[i*2]	= tap1( v_PositiveTapsR[i].xy );
-			negativeSamplesR[i*2]	= tap1( v_NegativeTapsR[i].xy );
-			positiveSamplesR[i*2+1]	= tap1( v_PositiveTapsR[i].zw );
-			negativeSamplesR[i*2+1]	= tap1( v_NegativeTapsR[i].zw );
-
-			positiveSamplesG[i*2]	= tap1( v_PositiveTapsG[i].xy );
-			negativeSamplesG[i*2]	= tap1( v_NegativeTapsG[i].xy );
-			positiveSamplesG[i*2+1]	= tap1( v_PositiveTapsG[i].zw );
-			negativeSamplesG[i*2+1]	= tap1( v_NegativeTapsG[i].zw );
-
-			positiveSamplesB[i*2]	= tap1( v_PositiveTapsB[i].xy );
-			negativeSamplesB[i*2]	= tap1( v_NegativeTapsB[i].xy );
-			positiveSamplesB[i*2+1]	= tap1( v_PositiveTapsB[i].zw );
-			negativeSamplesB[i*2+1]	= tap1( v_NegativeTapsB[i].zw );
+			positiveSamples[i*2]	= tap1( v_PositiveTaps[i].xy );
+			negativeSamples[i*2]	= tap1( v_NegativeTaps[i].xy );
+			positiveSamples[i*2+1]	= tap1( v_PositiveTaps[i].zw );
+			negativeSamples[i*2+1]	= tap1( v_NegativeTaps[i].zw );
 		#endif
 	}
 	
 	#if VIRTUAL_TAPS != 3
-		vec4 centerSample	= tap1( vec2(0,0) );
-		vec4 centerSampleR	= centerSample * u_BlurCenterTapWeight.x;
-		vec4 centerSampleG	= centerSample * u_BlurCenterTapWeight.y;
-		vec4 centerSampleB	= centerSample * u_BlurCenterTapWeight.z;
+		vec4 centerSample	= tap1( vec2(0,0) ) * u_BlurCenterTapWeight.x;
 	#endif
 
 	vec4 color = vec4( 0.0 );
@@ -182,13 +135,8 @@ void main()
 		#elif VIRTUAL_TAPS == 5
 			color += (samples * u_BlurWeights);
 		#elif VIRTUAL_TAPS == 7
-			color.r += length(positiveSamplesR * u_BlurWeightsR.xyz);
-			color.r += length(negativeSamplesR * u_BlurWeightsR.xyz);
-			color.g += length(positiveSamplesG * u_BlurWeightsG.xyz);
-			color.g += length(negativeSamplesG * u_BlurWeightsG.xyz);
-			color.b += length(positiveSamplesB * u_BlurWeightsB.xyz);
-			color.b += length(negativeSamplesB * u_BlurWeightsB.xyz);
-			color *= vec4(1.0 / 3.0);
+			color += (positiveSamples * u_BlurWeights.xyz);
+			color += (negativeSamples * u_BlurWeights.xyz);
 		#elif VIRTUAL_TAPS == 9
 			color += (positiveSamples * u_BlurWeights);
 			color += (negativeSamples * u_BlurWeights);

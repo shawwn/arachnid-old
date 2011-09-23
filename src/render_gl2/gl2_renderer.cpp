@@ -440,7 +440,7 @@ CGL2Renderer_impl::OnRedraw()
 	vBlurDeviationRGB.z = g_fBlurDeviationB;
 	if ( GL2Shader* pShader = g_Blur.SetupShader( vBlurDeviationRGB ) )
 	{
-		bool bTry(m.bKeysDown['G']);
+		bool bTry( !m.bKeysDown['G'] );
 		if ( bTry )
 		{
 			GL2Framebuffer::VerifyBind( m.pFBScreenPong );
@@ -488,7 +488,7 @@ CGL2Renderer_impl::OnKeyDown( unsigned char c, int, int )
 	switch ( c )
 	{
 	//case 'P':
-	//case 0x1B:	// ESC key
+	case 0x1B:	// ESC key
 	case 0x71:		// VK_F1
 		// quit.
 		OnClose();
@@ -811,9 +811,7 @@ GL2BlurRenderer::SetupShader( const SVec3d& vRGBDeviation )
 	if ( pShader )
 	{
 		SVec4 vCenterTapWeightsRGB( 0.0F, 0.0F, 0.0F, 0.0F );
-		SetupShader( pShader, GL2Shader::EP_BLUR_WEIGHTS_R, GL2Shader::EP_BLUR_OFFSETS_R, vRGBDeviation.x, vCenterTapWeightsRGB.x );
-		SetupShader( pShader, GL2Shader::EP_BLUR_WEIGHTS_G, GL2Shader::EP_BLUR_OFFSETS_G, vRGBDeviation.y, vCenterTapWeightsRGB.y );
-		SetupShader( pShader, GL2Shader::EP_BLUR_WEIGHTS_B, GL2Shader::EP_BLUR_OFFSETS_B, vRGBDeviation.z, vCenterTapWeightsRGB.z );
+		SetupShader( pShader, GL2Shader::EP_BLUR_WEIGHTS, GL2Shader::EP_BLUR_OFFSETS, vRGBDeviation.x, vCenterTapWeightsRGB.x );
 		pShader->SetEngineParam4fv( GL2Shader::EP_BLUR_CENTER_TAP_WEIGHT, vCenterTapWeightsRGB );
 	}
 	return pShader;
