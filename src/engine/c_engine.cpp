@@ -8,6 +8,8 @@
 #include "engine/c_system.h"
 #include "engine/c_filemanager.h"
 #include "engine/i_renderer.h"
+#include "engine/c_lua.h"
+#include "engine/c_luacontext.h"
 
 // graphics headers.
 #include "graphics/gr_camera.h"
@@ -15,6 +17,11 @@
 
 // math headers.
 #include "common/m_vec3.h"
+
+//***************************************************************************
+// Constants
+//***************************************************************************
+#define LOAD_RENDERER	1
 
 //***************************************************************************
 // Declarations
@@ -30,8 +37,12 @@ typedef map<string, IRenderer*>		RendererByNameMap;
 class CEngine_impl
 {
 public:
+	~CEngine_impl();
 	CEngine_impl();
 
+	void						Shutdown();
+
+	void						ReloadScripts();
 	void						LoadRendererDLLs();
 	bool						TryStartupRenderer( const char* sNameOfRenderer, PxU32 uiScreenWidth, PxU32 uiScreenHeight, const GrCamera& cCam );
 
@@ -43,6 +54,9 @@ public:
 	// camera state.
 	GrCamera					cCamera;
 
+	// scripting state.
+	CLuaContext*				pScript;
+
 	// timing/clock state.
 	PxU32						uiPrevTime;
 
@@ -51,10 +65,42 @@ public:
 };
 
 //---------------------------------------------------------------------------
+CEngine_impl::~CEngine_impl()
+{
+	Shutdown();
+}
+
+//---------------------------------------------------------------------------
 CEngine_impl::CEngine_impl()
 : bInitialized( false )
 , uiPrevTime( 0 )
+, pScript( NULL )
 {
+}
+
+//---------------------------------------------------------------------------
+void
+CEngine_impl::Shutdown()
+{
+	if ( pScript != NULL )
+	{
+		Lua.ReleaseContext( pScript );
+	}
+}
+
+//---------------------------------------------------------------------------
+void
+CEngine_impl::ReloadScripts()
+{
+	// recreate the scripting context.
+	if ( !pScript )
+		pScript = Lua.CreateContext();
+	else
+		Lua.ResetContext( pScript );
+
+	// load the world.
+	pScript->SetFromJsonFile( "/bin/scripts/world.json", "World" );
+	pScript->RunScript( "/bin/scripts/world" );
 }
 
 //---------------------------------------------------------------------------
@@ -189,17 +235,23 @@ CEngine::Startup( PxU32 uiScreenWidth, PxU32 uiScreenHeight )
 	{
 		printf("~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 		printf("All unit tests passed.\n");
+		printf("\n\n");
 	}
 
-# if RUN_TESTS_ONLY
+#if RUN_TESTS_ONLY
 	return true;
-# endif
+#endif
 #endif
 
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// Initialize Scripting
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	m.ReloadScripts();
+
+#if LOAD_RENDERER
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// Initialize Renderer
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 	// determine our possible renderers.
 	m.LoadRendererDLLs();
 
@@ -217,6 +269,7 @@ CEngine::Startup( PxU32 uiScreenWidth, PxU32 uiScreenHeight )
 		Shutdown();
 		return false;
 	}
+#endif
 
 	return true;
 }
@@ -255,6 +308,8 @@ CEngine::Shutdown()
 		UnloadRendererDLL( cRenderer );
 		m.mapRendererDLLs.erase( it );
 	}
+
+	m.Shutdown();
 }
 
 //---------------------------------------------------------------------------

@@ -16,6 +16,7 @@ public:
 	~CLua();
 
 	CLuaContext*	CreateContext();
+	void			ResetContext( CLuaContext* pContext );
 	void			ReleaseContext( CLuaContext*& pContext );
 
 private:

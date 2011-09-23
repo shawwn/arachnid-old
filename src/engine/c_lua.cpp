@@ -21,6 +21,7 @@ public:
 	~CLua_impl();
 	CLua_impl();
 
+	lua_State*	CreateLuaState();
 };
 
 //---------------------------------------------------------------------------
@@ -31,6 +32,29 @@ CLua_impl::~CLua_impl()
 //---------------------------------------------------------------------------
 CLua_impl::CLua_impl()
 {
+}
+
+//---------------------------------------------------------------------------
+lua_State*
+CLua_impl::CreateLuaState()
+{
+	// create a new Lua state.
+	lua_State* L = luaL_newstate();
+	if ( !L )
+	{
+		E_ASSERT( !"Could not create Lua state." );
+		return NULL;
+	}
+
+	// provide the standard Lua libraries.
+	luaopen_base( L );
+	luaopen_math( L );
+	luaopen_string( L );
+	luaopen_table( L );
+	luaopen_io( L );
+	luaopen_os( L );
+
+	return L;
 }
 
 
@@ -54,23 +78,18 @@ CLua::~CLua()
 CLuaContext*
 CLua::CreateContext()
 {
-	// create a new Lua state.
-	lua_State* L = luaL_newstate();
-	if ( !L )
-	{
-		E_ASSERT( !"Could not create Lua state." );
-		return NULL;
-	}
+	return E_NEW( CLuaContext )( m.CreateLuaState() );
+}
 
-	// provide the standard Lua libraries.
-	luaopen_base( L );
-	luaopen_math( L );
-	luaopen_string( L );
-	luaopen_table( L );
-	luaopen_io( L );
-	luaopen_os( L );
+//---------------------------------------------------------------------------
+void
+CLua::ResetContext( CLuaContext* pContext )
+{
+	E_ASSERT( pContext != NULL );
+	if ( !pContext )
+		return;
 
-	return E_NEW( CLuaContext )( L );
+	pContext->ReleaseState( m.CreateLuaState() );
 }
 
 //---------------------------------------------------------------------------
