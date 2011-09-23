@@ -28,14 +28,20 @@ public:
 	lua_State*	GetState();
 
 	void		Set( JSONNODE* pValue, const char* sName = "" );
-	void		SetFromJson( const char* json, const char* sName = "" );
+	bool		SetFromJson( const char* json, const char* sName = "" );
 	void		SetFromJsonFile( const string& sFilePath, const char* sName = "" );
 
+	int			Get( const char* sVariable, bool bGlobally = true );
+	bool		GetAsInt( int& iOutResult, const char* sVariable, int iDefault = 0, bool bGlobally = true );
+
 	// runs a script; returns the number of returned values.
-	int			RunScriptGetResults( const string& sPath );
+	int			ExecStringsGetResults( const char* sDebugName, const char** pLuaStrings, size_t uiCount );
+	int			ExecStringGetResults( const char* sDebugName, const char* sLuaCode );
+	int			ExecScriptGetResults( const string& sPath );
 
 	// runs a script, ignoring any returned values.
-	bool		RunScript( const string& sPath );
+	bool		ExecString( const char* sDebugName, const char* sLuaCode );
+	bool		ExecScript( const string& sPath );
 
 private:
 	E_IMPL( CLuaContext );

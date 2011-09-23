@@ -14,7 +14,7 @@ class E_API CEngine
 public:
 	~CEngine();
 
-	bool		Startup( PxU32 uiScreenWidth, PxU32 uiScreenHeight );
+	bool		Startup();
 	void		Shutdown();
 	bool		Frame();
 

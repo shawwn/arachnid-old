@@ -212,7 +212,7 @@ CTests_impl::TestLuaContext()
 		CLuaContext* pContext = Lua.CreateContext();
 
 		{
-			bSuccess &= PrintLuaResults( pContext, pContext->RunScriptGetResults( "/bin/scripts/tests/hello" ) );
+			bSuccess &= PrintLuaResults( pContext, pContext->ExecScriptGetResults( "/bin/scripts/tests/hello" ) );
 		}
 
 		{
@@ -222,7 +222,7 @@ CTests_impl::TestLuaContext()
 			pContext->Set( n, "foo" );
 			json_delete( n );
 
-			bSuccess &= PrintLuaResults( pContext, pContext->RunScriptGetResults( "/bin/scripts/tests/test" ) );
+			bSuccess &= PrintLuaResults( pContext, pContext->ExecScriptGetResults( "/bin/scripts/tests/test" ) );
 		}
 
 		Lua.ReleaseContext( pContext );

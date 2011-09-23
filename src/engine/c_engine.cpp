@@ -42,7 +42,7 @@ public:
 
 	void						Shutdown();
 
-	void						ReloadScripts();
+	CLuaContext*				ReloadScripts();
 	void						LoadRendererDLLs();
 	bool						TryStartupRenderer( const char* sNameOfRenderer, PxU32 uiScreenWidth, PxU32 uiScreenHeight, const GrCamera& cCam );
 
@@ -89,7 +89,7 @@ CEngine_impl::Shutdown()
 }
 
 //---------------------------------------------------------------------------
-void
+CLuaContext*
 CEngine_impl::ReloadScripts()
 {
 	// recreate the scripting context.
@@ -98,9 +98,15 @@ CEngine_impl::ReloadScripts()
 	else
 		Lua.ResetContext( pScript );
 
+	// load the configuration.
+	pScript->SetFromJsonFile( "/bin/scripts/config.json", "Config" );
+	pScript->ExecScript( "/bin/scripts/config" );
+
 	// load the world.
 	pScript->SetFromJsonFile( "/bin/scripts/world.json", "World" );
-	pScript->RunScript( "/bin/scripts/world" );
+	pScript->ExecScript( "/bin/scripts/world" );
+
+	return pScript;
 }
 
 //---------------------------------------------------------------------------
@@ -212,10 +218,8 @@ CEngine::~CEngine()
 
 //---------------------------------------------------------------------------
 bool
-CEngine::Startup( PxU32 uiScreenWidth, PxU32 uiScreenHeight )
+CEngine::Startup()
 {
-	E_UNREF_PARAM2( uiScreenWidth, uiScreenHeight );
-
 	E_ASSERT( !m.bInitialized );
 	if ( m.bInitialized )
 		return false;
@@ -246,7 +250,21 @@ CEngine::Startup( PxU32 uiScreenWidth, PxU32 uiScreenHeight )
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// Initialize Scripting
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	m.ReloadScripts();
+	CLuaContext* pScript = m.ReloadScripts();
+	E_ASSERT( pScript );
+	if ( !pScript )
+	{
+		Shutdown();
+		return false;
+	}
+
+	// fetch the screen resolution as specified by the config file.
+	int iScreenWidth;
+	int iScreenHeight;
+	pScript->GetAsInt( iScreenWidth, "Config.Screen.Width", 1280 );
+	pScript->GetAsInt( iScreenHeight, "Config.Screen.Height", 720 );
+	iScreenWidth = Max(1, iScreenWidth );
+	iScreenHeight = Max(1, iScreenHeight );
 
 #if LOAD_RENDERER
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -260,10 +278,10 @@ CEngine::Startup( PxU32 uiScreenWidth, PxU32 uiScreenHeight )
 		MVec3(0.25F, 0.0F, 0.25F),
 		MVec3(0.0F, 0.0F, 0.0F),
 		MVec3(0.0F, 1.0F, 0.0F),
-		GrProjection( DegToRad(40.0F), (uiScreenWidth / (PxF32)uiScreenHeight), 0.02F, 1000.0F, 1000.0F ) );
+		GrProjection( DegToRad(40.0F), (iScreenWidth / (PxF32)iScreenHeight), 0.02F, 1000.0F, 1000.0F ) );
 
 	// startup the "gl2" renderer only, for now.
-	if ( !m.TryStartupRenderer( "gl2", uiScreenWidth, uiScreenHeight, m.cCamera ) )
+	if ( !m.TryStartupRenderer( "gl2", (PxU32)iScreenWidth, (PxU32)iScreenHeight, m.cCamera ) )
 	{
 		E_ASSERT( !"Failed to startup GL2 renderer." );
 		Shutdown();

@@ -11,6 +11,13 @@
 #include "include_libjson.h"
 
 //***************************************************************************
+// Helper Functions
+//***************************************************************************
+
+// loads multiple strings as a single Lua code block.
+static int	LuaLoadStrings( lua_State* L, const char** pStrings, size_t uiCount );
+
+//***************************************************************************
 // Helper Macros
 //***************************************************************************
 #define _LUA_BEGIN()
@@ -47,11 +54,14 @@ public:
 	~CLuaContext_impl();
 	CLuaContext_impl( lua_State* L );
 
-	void		ReleaseState( lua_State* pReplacement );
+	void			ReleaseState( lua_State* pReplacement );
 
-	void		ConvertJsonToLuaTable( JSONNODE* pNode );
+	void			ConvertJsonToLuaTable( const char* sDebugName, JSONNODE* pNode );
 
-	lua_State*	L;
+	void			Get( char* sVariable );
+
+	CLuaContext*	pContext;
+	lua_State*		L;
 };
 
 //---------------------------------------------------------------------------
@@ -62,7 +72,8 @@ CLuaContext_impl::~CLuaContext_impl()
 
 //---------------------------------------------------------------------------
 CLuaContext_impl::CLuaContext_impl( lua_State* L )
-: L( L )
+: pContext( NULL )
+, L( L )
 {
 }
 
@@ -78,7 +89,7 @@ CLuaContext_impl::ReleaseState( lua_State* pReplacement )
 
 //---------------------------------------------------------------------------
 void
-CLuaContext_impl::ConvertJsonToLuaTable( JSONNODE* pParent )
+CLuaContext_impl::ConvertJsonToLuaTable( const char* sDebugName, JSONNODE* pParent )
 {
 	char eParentType = json_type( pParent );
 
@@ -109,7 +120,48 @@ CLuaContext_impl::ConvertJsonToLuaTable( JSONNODE* pParent )
 					if ( eChildType == JSON_NULL )
 						lua_pushnil( L );
 					else if ( eChildType == JSON_STRING )
-						lua_pushstring( L, json_as_string(pChild) );
+					{
+						json_char* sValue = json_as_string( pChild );
+						if ( IsEmpty( sValue ) )
+							sValue = "";
+
+						// if the string begins with an equals sign, then evaluate the rest
+						// as literal Lua code.  E.g.:
+						//
+						//		"= (Screen.Width / Screen.Height)"
+						//
+						// ... evaluates to, say, (1024 / 768) == 1.3333...
+						if ( sValue[0] == '=' )
+						{
+							// skip all whitespace leading up to the source code.
+							const char* sCode = &sValue[1];
+							while ( *sCode && IsWhitespace( sCode[0] ) )
+								++sCode;
+
+							// execute the string without the leading equals sign, and with
+							// a leading "return" statement.  E.g:
+							//
+							//	"return (Screen.Width / Screen.Height)"
+							//
+							const char* pSourceCode[2] = { "return ", sCode };
+							int iNumResults = pContext->ExecStringsGetResults( sDebugName, pSourceCode, 2 );
+
+							if ( iNumResults <= 0 )
+							{
+								lua_pushnil( L );
+							}
+							else
+							{
+								// we only care about the first return value, so get rid of the rest.
+								if ( iNumResults > 1 )
+									lua_pop( L, (iNumResults - 1) );
+							}
+						}
+						else
+						{
+							lua_pushstring( L, sValue );
+						}
+					}
 					else if ( eChildType == JSON_NUMBER )
 						lua_pushnumber( L, (lua_Number)json_as_float(pChild) );
 					else if ( eChildType == JSON_BOOL )
@@ -130,7 +182,7 @@ CLuaContext_impl::ConvertJsonToLuaTable( JSONNODE* pParent )
 						lua_pushstring( L, sName );
 
 					lua_newtable( L );
-					ConvertJsonToLuaTable( pChild );
+					ConvertJsonToLuaTable( sDebugName, pChild );
 
 					// if my parent is an array, and we have a 'Name' field,
 					// then set "parent[name] = child" (so we can lookup
@@ -177,6 +229,28 @@ CLuaContext_impl::ConvertJsonToLuaTable( JSONNODE* pParent )
 	LUA_END();
 }
 
+//---------------------------------------------------------------------------
+void
+CLuaContext_impl::Get( char* sVariable )
+{
+	bool bIsTable = lua_istable( L, -1 );
+	E_ASSERT( bIsTable );
+	if ( !bIsTable )
+		return;
+
+	char* sPeriod = strchr(sVariable, '.');
+	if ( !sPeriod )
+	{
+		lua_getfield( L, -1, sVariable );
+	}
+	else
+	{
+		sPeriod[0] = '\0';
+		lua_getfield( L, -1, sVariable );
+		Get( &sPeriod[1] );
+	}
+}
+
 
 //===========================================================================
 // LuaContext
@@ -198,6 +272,7 @@ CLuaContext_impl::ConvertJsonToLuaTable( JSONNODE* pParent )
 CLuaContext::CLuaContext( lua_State* L )
 : E_IMPL_NEW(CLuaContext, L)
 {
+	m.pContext = this;
 }
 
 //---------------------------------------------------------------------------
@@ -230,51 +305,157 @@ CLuaContext::Set( JSONNODE* pValue, const char* sName )
 	LUA_BEGIN();
 	{
 		lua_newtable( L );
-		m.ConvertJsonToLuaTable( pValue );
+		m.ConvertJsonToLuaTable( sName, pValue );
 		lua_setglobal( L, sName );
 	}
 	LUA_END();
 }
 
 //---------------------------------------------------------------------------
-void
+bool
 CLuaContext::SetFromJson( const char* json, const char* sName )
 {
+	bool bSuccess = false;
 	LUA_BEGIN();
 	{
 		if ( IsEmpty( json ) )
 		{
 			lua_pushnil( L );
 			lua_setglobal( L, sName );
+			bSuccess = true;
 		}
 		else
 		{
-			JSONNODE* pNode( json_parse( json ) );
-			if ( !pNode )
+			if ( json_is_valid( json ) )
 			{
-				lua_pushnil( L );
-				lua_setglobal( L, sName );
-			}
-			else
-			{
-				Set( pNode, sName );
-				json_delete( pNode );
+				JSONNODE* pNode( json_parse( json ) );
+				if ( !pNode )
+				{
+					lua_pushnil( L );
+					lua_setglobal( L, sName );
+				}
+				else
+				{
+					Set( pNode, sName );
+					json_delete( pNode );
+					bSuccess = true;
+				}
 			}
 		}
 	}
 	LUA_END();
+	return bSuccess;
 }
 
 //---------------------------------------------------------------------------
 void
 CLuaContext::SetFromJsonFile( const string& sFilePath, const char* sName )
 {
-	SetFromJson( FileManager.OpenFile( sFilePath ).GetFileMem(), sName );
+	printf( "Loading JSON file '%s'... \n", sFilePath.c_str() );
+	if ( !SetFromJson( FileManager.OpenFile( sFilePath ).GetFileMem(), sName ) )
+	{
+		fprintf(stderr, "Failed to load JSON file '%s' (invalid syntax?)\n", sFilePath.c_str());
+	}
 }
 
 //---------------------------------------------------------------------------
 int
-CLuaContext::RunScriptGetResults( const string& sPath )
+CLuaContext::Get( const char* sVariable, bool bGlobally )
+{
+	size_t uiVariableNameLen = strlen( sVariable );
+	E_ASSERT( uiVariableNameLen < 2047 );
+	if ( uiVariableNameLen >= 2047 )
+		return -1;
+
+	char* scratch = (char*)alloca( uiVariableNameLen + 1 );
+	strcpy_s( scratch, (uiVariableNameLen + 1), sVariable );
+
+	// store the current top.
+	int top = lua_gettop( LUA_STATE );
+
+	if ( bGlobally )
+	{
+		// push the globals table on the stack.
+		lua_getglobal( LUA_STATE, "_G" );
+	}
+
+	// follow the variable name chain, e.g. "Config.Screen.Width"
+	m.Get( scratch );
+
+	// return the number of things on the stack.
+	int topnow = lua_gettop( LUA_STATE );
+	E_ASSERT( topnow >= top );
+
+	return (topnow - top);
+}
+
+//---------------------------------------------------------------------------
+bool
+CLuaContext::GetAsInt( int& iOutResult, const char* sVariable, int iDefault, bool bGlobally )
+{
+	iOutResult = iDefault;
+
+	{
+		bool bSuccess = false;
+
+		int iPop = Get( sVariable, bGlobally );
+
+		bool bIsNumber = (lua_isnumber( LUA_STATE, -1 ) != 0);
+		if ( bIsNumber )
+		{
+			iOutResult = (int)lua_tonumber( LUA_STATE, -1 );
+			bSuccess = true;
+		}
+
+		lua_pop( LUA_STATE, iPop );
+		return bSuccess;
+	}
+}
+
+//---------------------------------------------------------------------------
+int
+CLuaContext::ExecStringsGetResults( const char* sDebugName, const char** pLuaStrings, size_t uiCount )
+{
+	int iNumReturnValues = -1;
+	LUA_BEGIN();
+	{
+		int status = LuaLoadStrings( L, pLuaStrings, uiCount );
+		if ( status ) 
+		{
+			// if something went wrong, error message is at the top of
+			// the stack.
+			fprintf( stderr, "Errors in inline code from '%s.lua':\n%s\n", sDebugName, lua_tostring(L, -1) );
+			CLEAR_STACK();
+		}
+		else
+		{
+			// ask Lua to run our code.
+			int result = lua_pcall( L, 0, LUA_MULTRET, 0 );
+			if ( result )
+			{
+				fprintf( stderr, "Failed to run inline code from '%s.lua':\n%s\n", sDebugName, lua_tostring(L, -1) );
+				CLEAR_STACK();
+			}
+			else
+			{
+				iNumReturnValues = ( lua_gettop(L) - LUA_TOP(0) );
+			}
+		}
+	}
+	LUA_END_N( iNumReturnValues );
+	return iNumReturnValues;
+}
+
+//---------------------------------------------------------------------------
+int
+CLuaContext::ExecStringGetResults( const char* sDebugName, const char* sLuaCode )
+{
+	return ExecStringsGetResults( sDebugName, &sLuaCode, 1 );
+}
+
+//---------------------------------------------------------------------------
+int
+CLuaContext::ExecScriptGetResults( const string& sPath )
 {
 	int iNumReturnValues = -1;
 	LUA_BEGIN();
@@ -282,7 +463,7 @@ CLuaContext::RunScriptGetResults( const string& sPath )
 		CFileHandle hScript( FileManager.OpenFile(sPath + ".lua") );
 		if ( !hScript.IsOpen() )
 		{
-			fprintf(stderr, "Couldn't locate script '%s'\n", sPath.c_str());
+			fprintf(stderr, "Couldn't locate script '%s.lua'\n", sPath.c_str());
 		}
 		else
 		{
@@ -291,16 +472,16 @@ CLuaContext::RunScriptGetResults( const string& sPath )
 			{
 				// if something went wrong, error message is at the top of
 				// the stack.
-				fprintf( stderr, "Errors in script '%s':\n%s\n", sPath.c_str(), lua_tostring(L, -1) );
+				fprintf( stderr, "Errors in script '%s.lua':\n%s\n", sPath.c_str(), lua_tostring(L, -1) );
 				CLEAR_STACK();
 			}
 			else
 			{
-				// ask Lua to run our little script.
+				// ask Lua to run our code.
 				int result = lua_pcall( L, 0, LUA_MULTRET, 0 );
 				if ( result )
 				{
-					fprintf( stderr, "Failed to run script '%s':\n%s\n", sPath.c_str(), lua_tostring(L, -1) );
+					fprintf( stderr, "Failed to run script '%s.lua':\n%s\n", sPath.c_str(), lua_tostring(L, -1) );
 					CLEAR_STACK();
 				}
 				else
@@ -316,14 +497,62 @@ CLuaContext::RunScriptGetResults( const string& sPath )
 
 //---------------------------------------------------------------------------
 bool
-CLuaContext::RunScript( const string& sPath )
+CLuaContext::ExecString( const char* sDebugName, const char* sLuaCode )
 {
 	// run the script.
-	int iNumResults = RunScriptGetResults( sPath );
+	int iNumResults = ExecStringGetResults( sDebugName, sLuaCode );
 	if ( iNumResults < 0 )
 		return false;
 
 	// ignore any return values.
 	lua_pop( LUA_STATE, iNumResults );
 	return true;
+}
+
+//---------------------------------------------------------------------------
+bool
+CLuaContext::ExecScript( const string& sPath )
+{
+	// run the script.
+	int iNumResults = ExecScriptGetResults( sPath );
+	if ( iNumResults < 0 )
+		return false;
+
+	// ignore any return values.
+	lua_pop( LUA_STATE, iNumResults );
+	return true;
+}
+
+//***************************************************************************
+// Helper Functions - Implementation
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+static int
+LuaLoadStrings( lua_State* L, const char** pStrings, size_t uiCount )
+{
+	// push the strings onto the stack.
+	for ( size_t i = 0; i < uiCount; ++i )
+		lua_pushstring( L, pStrings[i] );
+
+	// concatenate them.
+	lua_concat( L, (int)uiCount );
+
+	// fetch the result.
+	const char* sSourceCode = lua_tostring( L, -1 );
+	int iSourceCodeIdx = lua_gettop( L );
+
+	// load it as Lua code.
+	int iResult = luaL_loadstring( L, sSourceCode );
+
+	// the stack currently looks like:
+	//
+	//	[source code]
+	//	[loaded block or error message]
+	//
+	// remove the source code from the stack; we only want the block or error message.
+	lua_remove( L, iSourceCodeIdx );
+
+	// return the status code.
+	return iResult;
 }
