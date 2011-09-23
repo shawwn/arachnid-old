@@ -28,8 +28,10 @@ E_INLINE bool	StringContains( const string& sHaystack, const string& sNeedle )	{
 extern bool		StringEqual( const char* s1, const char* s2 );
 extern bool		StringEqual( const char* s1, const char* s2, bool bIgnoreCase );
 
-E_INLINE bool	IsWhitespace( char c )							{	return isspace( c ) ? true : false;	}
+E_INLINE bool	IsWhitespace( char c )							{	return isspace( c ) ? true : false;				}
 extern bool		IsWhitespace( const string& sStr );
+
+E_INLINE bool	IsEmpty( const char* str )						{	return ( (str == NULL) || (*str == '\0') );		}
 
 // "foo/bar/baz.jpg" => "foo/bar/"
 extern string	Path_GetDirectory( const string& sPath );

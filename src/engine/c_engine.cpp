@@ -1,6 +1,9 @@
 #include "engine_afx.h"
 #include "c_engine.h"
 
+#pragma warning( disable: 4702 ) // unreachable code
+
+// various subsystem headers.
 #include "engine/c_tests.h"
 #include "engine/c_system.h"
 #include "engine/c_filemanager.h"
@@ -172,9 +175,31 @@ CEngine::Startup( PxU32 uiScreenWidth, PxU32 uiScreenHeight )
 		return false;
 	m.bInitialized = true;
 
-#if 0
-	return Tests.RunAll();
-#else
+#if RUN_TESTS
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// Run Unit Tests
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	if ( !Tests.RunAll() )
+	{
+		printf("*************************\n");
+		printf("Some unit tests failed.\n");
+		printf("*************************\n");
+	}
+	else
+	{
+		printf("~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+		printf("All unit tests passed.\n");
+	}
+
+# if RUN_TESTS_ONLY
+	return true;
+# endif
+#endif
+
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	// Initialize Renderer
+	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 	// determine our possible renderers.
 	m.LoadRendererDLLs();
 
@@ -194,7 +219,6 @@ CEngine::Startup( PxU32 uiScreenWidth, PxU32 uiScreenHeight )
 	}
 
 	return true;
-#endif
 }
 
 //---------------------------------------------------------------------------
