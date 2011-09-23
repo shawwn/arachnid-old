@@ -222,7 +222,7 @@ CTests_impl::TestLuaContext()
 			pContext->Set( n, "foo" );
 			json_delete( n );
 
-			bSuccess &= PrintLuaResults( pContext, pContext->RunScript( "/bin/scripts/test" ) );
+			bSuccess &= PrintLuaResults( pContext, pContext->RunScript( "/bin/scripts/tests/test" ) );
 		}
 
 		Lua.ReleaseContext( pContext );
