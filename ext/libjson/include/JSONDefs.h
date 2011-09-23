@@ -130,6 +130,7 @@ typedef void (*json_free_t)(void *);
     typedef void * (*json_malloc_t)(size_t);
     typedef void * (*json_realloc_t)(void *, size_t);
 #else
+	#undef JSONNODE
     #define JSONNODE void  /* so that JSONNODE* is void* */
     typedef JSONNODE** JSONNODE_ITERATOR;
     #ifdef JSON_STREAM

@@ -2,12 +2,7 @@
 #include "c_luacontext.h"
 
 // Lua headers.
-extern "C"
-{
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
-}
+#include "include_lua.h"
 
 //***************************************************************************
 // Definitions

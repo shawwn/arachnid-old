@@ -1,10 +1,12 @@
 #pragma once
 
+#include "include_lua_decls.h"
+#include "include_libjson_decls.h"
+
 //***************************************************************************
 // Declarations
 //***************************************************************************
 class CLuaContext_impl;
-typedef struct lua_State lua_State;
 
 //===========================================================================
 // LuaContext
