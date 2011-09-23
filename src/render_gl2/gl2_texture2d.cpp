@@ -70,16 +70,73 @@ GL2Texture2D::LoadFromImage( GrImage* pImage )
 
 //---------------------------------------------------------------------------
 GL2Texture2D*
-GL2Texture2D::LoadFromFile( const string& sPath )
+GL2Texture2D::LoadFromFile( const string& sDirtyPath, string sFileExt )
 {
-	// load the image.
-	GrImage* pTestImage = GrImage::LoadImageFromFile( FileManager.OpenFile( sPath ) );
-	// make the texture.
-	GL2Texture2D* pTex = GL2Texture2D::LoadFromImage( pTestImage );
-	// delete the image.
-	E_DELETE( pTestImage );
-	// return the texture.
-	return pTex;
+	// ensure our file extension is not empty, and begins with a period.  This is required.
+	if ( sFileExt.empty() )
+		sFileExt = ".png";
+	else if ( sFileExt[0] != '.' )
+		sFileExt = ( "." + sFileExt );
+
+	// the path may not contain wildcard characters.
+	if ( sDirtyPath.find_first_of( "*?" ) != string::npos )
+	{
+		E_ASSERT( !"wildcard characters not allowed in this path." );
+		return NULL;
+	}
+	string sPath( FileManager.NormalizePath( sDirtyPath ) );
+
+	// extract the base path and its filename.
+	string sDirectory;
+	string sFilenameBase;
+	{
+		size_t uiSlashPos = sPath.find_last_of( "/\\" );
+		if ( uiSlashPos == string::npos )
+		{
+			sDirectory = "./";
+			sFilenameBase = sPath;
+		}
+		else
+		{
+			sDirectory = sPath.substr( 0, (uiSlashPos + 1) );
+			sFilenameBase = sPath.substr( uiSlashPos + 1 );
+		}
+	}
+
+	// fetch a list of all possible textures.  (foo.png, foo.jpg, foo.tga, and so on.)
+	StringList vFiles;
+	FileManager.FindFiles( vFiles, sDirectory, (sFilenameBase + sFileExt) );
+
+	// sort the list of textures by priority, determined by extension.  (PNG textures
+	// take priority over JPG textures, etc.)
+	PrioritizeImageFilenames( vFiles );
+
+	// loop over the list of texture filenames.  For each filename, attempt to load it.
+	// If we successfully load it, then we're done; return it.
+	for ( size_t i = 0; i < vFiles.size(); ++i )
+	{
+		const string& sFilename( vFiles[i] );
+
+		// load the image.
+		GrImage* pTestImage = GrImage::LoadImageFromFile( FileManager.OpenFile( FileManager.Join(sDirectory, sFilename) ) );
+		if ( pTestImage != NULL )
+		{
+			// make the texture.
+			GL2Texture2D* pTex = GL2Texture2D::LoadFromImage( pTestImage );
+
+			// delete the image.
+			E_DELETE( pTestImage );
+
+			if ( pTex != NULL )
+			{
+				// if we've successfully loaded the texture, then return it; we're done.
+				return pTex;
+			}
+		}
+	}
+
+	// we've failed to load any texture of the specified name.
+	return NULL;
 }
 
 //---------------------------------------------------------------------------
@@ -98,7 +155,7 @@ GL2Texture2D::LoadMipsFromFile( const string& sDirtyPath, PxU32 kMaxResolution, 
 		E_ASSERT( !"wildcard characters not allowed in this path." );
 		return NULL;
 	}
-	string sPath( FileManager.NormalizePath(sDirtyPath) );
+	string sPath( FileManager.NormalizePath( sDirtyPath ) );
 
 	// extract the base path and its filename.
 	string sDirectory;
@@ -147,8 +204,18 @@ GL2Texture2D::LoadMipsFromFile( const string& sDirtyPath, PxU32 kMaxResolution, 
 
 	// remove duplicates.
 	std::unique( vPossibleResolutions.begin(), vPossibleResolutions.end() );
+
+	// if no miplevels are specified, then simply load any texture.
 	if ( vPossibleResolutions.empty() )
-		return NULL;
+	{
+		GL2Texture2D* pTex = LoadFromFile( sPath, sFileExt );
+		if ( pTex )
+		{
+			// generate the miplevels.
+			glGenerateMipmap( GL_TEXTURE_2D );
+		}
+		return pTex;
+	}
 
 	// sort from highest to highest resolution.
 	std::sort( vPossibleResolutions.begin(), vPossibleResolutions.end(), std::greater<PxU32>() );

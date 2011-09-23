@@ -17,7 +17,9 @@ public:
 	~GL2Texture2D();
 
 	static GL2Texture2D*	LoadFromImage( GrImage* pImage );
-	static GL2Texture2D*	LoadFromFile( const string& sPath );
+	static GL2Texture2D*	LoadFromFile( const string& sPath,
+											// e.g.: ".png" ... however, typically just leave it as the wildcard search.
+											string sFileExt = ".*" );
 	static GL2Texture2D*	LoadMipsFromFile(
 											// e.g: "/media/textures/rock" if you want to load "/media/textures/rock.jpg"
 											const string& sPath,

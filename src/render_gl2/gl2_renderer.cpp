@@ -621,6 +621,7 @@ CGL2Renderer::Startup( PxU32 uiScreenW, PxU32 uiScreenH )
 		// diffuse map.
 		{
 			m.pTestDiffuseMap = GL2Texture2D::LoadMipsFromFile( "/media/props/human_head/human_head_d" );
+			//m.pTestDiffuseMap = GL2Texture2D::LoadMipsFromFile( "/media/textures/pavement/pavement" );
 			//m.pTestDiffuseMap = GL2Texture2D::LoadMipsFromFile( "/media/system/textures/mips/mips" );
 		}
 		E_ASSERT( m.pTestDiffuseMap );
