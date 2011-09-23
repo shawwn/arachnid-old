@@ -34,30 +34,29 @@
 //===========================================================================
 // Shader Parameters
 //===========================================================================
+// camera.
 #define GL2_MODEL_VIEW_PROJECTION_MATRIX_NAME	"u_ModelViewProjectionMatrix"
 #define GL2_VIEW_POS_NAME						"u_ViewPos"
-#define GL2_LIGHT_POS_NAME						"u_LightPos"
 
+// lighting.
+#define GL2_LIGHT_POS_NAME						"u_LightPos"
+#define GL2_LIGHT_COLOR_NAME					"u_LightColor"
+
+// blurring.
+#define GL2_BLUR_DIRECTION_NAME					"u_BlurDirection"
+#define GL2_BLUR_WEIGHTS_R_NAME					"u_BlurWeightsR"
+#define GL2_BLUR_WEIGHTS_G_NAME					"u_BlurWeightsG"
+#define GL2_BLUR_WEIGHTS_B_NAME					"u_BlurWeightsB"
+#define GL2_BLUR_OFFSETS_R_NAME					"u_BlurOffsetsR"
+#define GL2_BLUR_OFFSETS_G_NAME					"u_BlurOffsetsG"
+#define GL2_BLUR_OFFSETS_B_NAME					"u_BlurOffsetsB"
+#define GL2_BLUR_CENTER_TAP_WEIGHT_NAME			"u_BlurCenterTapWeight"
+
+// samplers
 #define GL2_TEX_DIFFUSE							1
 #define GL2_TEX_DIFFUSE_NAME					"s_DiffuseTex"
-
 #define GL2_TEX_NORMAL							2
 #define GL2_TEX_NORMAL_NAME						"s_NormalTex"
-
-/*
-#define GL2_TEX_SKIN0							3
-#define GL2_TEX_SKIN1							(GL2_TEX_SKIN0 + 1)
-#define GL2_TEX_SKIN2							(GL2_TEX_SKIN0 + 2)
-#define GL2_TEX_SKIN3							(GL2_TEX_SKIN0 + 3)
-#define GL2_TEX_SKIN4							(GL2_TEX_SKIN0 + 4)
-#define GL2_TEX_SKIN5							(GL2_TEX_SKIN0 + 5)
-#define GL2_TEX_SKIN6							(GL2_TEX_SKIN0 + 6)
-#define GL2_TEX_SKIN0_NAME						"s_Skin0Tex"
-#define GL2_TEX_SKIN1_NAME						"s_Skin1Tex"
-#define GL2_TEX_SKIN2_NAME						"s_Skin2Tex"
-#define GL2_TEX_SKIN3_NAME						"s_Skin3Tex"
-#define GL2_TEX_SKIN4_NAME						"s_Skin4Tex"
-#define GL2_TEX_SKIN5_NAME						"s_Skin5Tex"
-#define GL2_TEX_SKIN6_NAME						"s_Skin6Tex"
-*/
+#define GL2_TEX_CURRENT							3
+#define GL2_TEX_CURRENT_NAME					"s_CurrentTex"
 

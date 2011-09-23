@@ -27,9 +27,23 @@ public:
 
 	enum EPARAM
 	{
+		// camera parameters.
 		EP_MODEL_VIEW_PROJECTION_MATRIX,
 		EP_VIEW_POS,
+
+		// light parameters.
 		EP_LIGHT_POS,
+		EP_LIGHT_COLOR,
+
+		// postprocessing parameters.
+		EP_BLUR_DIRECTION,
+		EP_BLUR_WEIGHTS_R,
+		EP_BLUR_WEIGHTS_G,
+		EP_BLUR_WEIGHTS_B,
+		EP_BLUR_OFFSETS_R,
+		EP_BLUR_OFFSETS_G,
+		EP_BLUR_OFFSETS_B,
+		EP_BLUR_CENTER_TAP_WEIGHT,
 
 		EP_COUNT
 	};

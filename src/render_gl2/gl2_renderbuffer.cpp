@@ -65,6 +65,7 @@ GL2Renderbuffer::CreateRenderbuffer( // possible glType values:
 		case GL_RGBA16F:
 		case GL_DEPTH_COMPONENT24:
 		case GL_STENCIL_INDEX:
+		case GL_DEPTH24_STENCIL8_EXT:
 			break;
 		default:
 			E_ASSERT( !"Unexpected GL type for CreateRenderuffer(); proceeding..." );

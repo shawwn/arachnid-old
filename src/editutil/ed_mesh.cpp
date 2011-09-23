@@ -55,7 +55,7 @@ EdMesh::~EdMesh()
 
 //---------------------------------------------------------------------------
 EdMesh*
-EdMesh::LoadFromFile( CFileHandle& hFile )
+EdMesh::LoadFromFile( const CFileHandle& hFile )
 {
 	// ensure that the mesh importer is loaded.
 	E_ASSERT( gMeshImport );

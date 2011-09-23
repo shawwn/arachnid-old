@@ -32,10 +32,11 @@ public:
 	static void					Bind( GL2TextureBase* pRenderbuffer );
 	static void					Unbind();
 
-	virtual PxU32				GetGLHandle()				{ return m_hGLHandle;	}
-	virtual PxU32				GetMiplevelCount()			{ return 1;	}
-	virtual PxU32				GetWidth()					{ return m_uiWidth;		}
-	virtual PxU32				GetHeight()					{ return m_uiHeight;	}
+	virtual PxU32				GetGLTarget()				{ return GL_RENDERBUFFER;	}
+	virtual PxU32				GetGLHandle()				{ return m_hGLHandle;		}
+	virtual PxU32				GetMiplevelCount()			{ return 1;					}
+	virtual PxU32				GetWidth()					{ return m_uiWidth;			}
+	virtual PxU32				GetHeight()					{ return m_uiHeight;		}
 
 private:
 	GLuint						m_hGLHandle;

@@ -8,7 +8,7 @@ SINGLETON_INIT( CFileManager );
 //***************************************************************************
 // Declarations
 //***************************************************************************
-typedef map<string,	CFileHandle>	PathToFileMap;
+typedef map<string,	CFile*>		PathToFileMap;
 
 //===========================================================================
 // FileFind - a 3rd party snippet to find a file by wildcard.
@@ -195,27 +195,33 @@ CFileManager::~CFileManager()
 }
 
 //---------------------------------------------------------------------------
-CFileHandle&
+CFileHandle
 CFileManager::OpenFile( const string& sDirtyPath, const char* sMode /*= "rb" */ )
 {
 	// normalize the path.
 	string sPath;
 	NormalizePath( sPath, sDirtyPath );
 
-	// if we've already opened that file, then return a handle to it.
+	// get the file.
+	CFile* pFile( NULL );
 	{
 		PathToFileMap::iterator itFind( m.mapFiles.find(sPath) );
 		if ( itFind != m.mapFiles.end() )
 		{
-			CFileHandle& hFile( itFind->second );
-			{
-				// hmm, not sure about this.  For now, don't store FileHandles persistently,
-				// or access them concurrently.
-				hFile.Seek(0);
-			}
-			return hFile;
+			// if we've already opened the file, then use a handle to it.
+			CFile* pCurFile( itFind->second );
+			E_ASSERT( pCurFile != NULL );
+			if ( pCurFile != NULL )
+				pFile = pCurFile;
+		}
+		else
+		{
+			// create a new file handle.
+			pFile = E_NEW( CFile )( sPath );
+			m.mapFiles.insert( make_pair(sPath, pFile) );
 		}
 	}
+	E_ASSERT( pFile != NULL );
 
 	// try to open the file.
 	FILE* fp;
@@ -228,7 +234,7 @@ CFileManager::OpenFile( const string& sDirtyPath, const char* sMode /*= "rb" */ 
 		fp = fopen( sSystemPath.c_str(), sMode );
 		if ( !fp )
 		{
-			E_ASSERT( !"Failed to open file." );
+			//E_ASSERT( !"Failed to open file." );
 			return FNULL;
 		}
 	}
@@ -268,24 +274,40 @@ CFileManager::OpenFile( const string& sDirtyPath, const char* sMode /*= "rb" */ 
 	MemZero( &pMem[uiFileSize], kNullTerminatorSize );
 
 	// wrap it.
-	CFile* pFile( CFile::NewFromMemory( sPath, pMem, uiFileSize, true ) );
+	E_ASSERT( pFile != NULL );
+	if ( pFile )
+		pFile->InitFromMemory( pMem, uiFileSize, true );
 
-	// return a handle to it.
-	CFileHandle& hFile( m.mapFiles[sPath] );
-	E_ASSERT( hFile.m_pFile == NULL );
-	hFile.m_pFile = pFile;
-	return hFile;
+	return pFile;
 }
 
 //---------------------------------------------------------------------------
-void
-CFileManager::CloseFile( CFile*& pFile )
+bool
+CFileManager::ShouldIgnoreCase()
 {
-	if ( !pFile )
-		return;
+#ifdef WIN32
+	// windows ignores the case of a filename.
+	return true;
+#else
+	// unix is case sensitive.
+	return false;
+#endif
+}
 
-	E_DELETE( pFile );
-	pFile = NULL;
+//---------------------------------------------------------------------------
+string
+CFileManager::Join( const string& sBase, const string& sExt )
+{
+	if ( sBase.empty() )
+		return sExt;
+
+	// if it doesn't end with a separator, then append it.
+	E_ASSERT( !sBase.empty() );
+	char cLast = sBase[sBase.size() - 1];
+	if ( (cLast != '/') && (cLast != '\\') )
+		return ( sBase + '/' + sExt );
+	else
+		return ( sBase + sExt );
 }
 
 //---------------------------------------------------------------------------
@@ -441,15 +463,17 @@ CFileManager::GetSystemPath( string& sOutPath, const string& sNormalizedPath )
 	//	or "http://www.xkcd.com"
 	bool bAbsolute = false;
 	{
-		const bool IGNORE_CASE (true);
-
-		if ( sOutPath[0] == '/' || sOutPath[0] == '\\' )
+		if ( sNormalizedPath[0] == '/' || sNormalizedPath[0] == '\\' )
 			bAbsolute = false;
-		else if ( StartsWith( sOutPath, "http://", IGNORE_CASE ) )
+		if ( StartsWith(sNormalizedPath, GetWorkingDir()) && !GetWorkingDir().empty() )
 			bAbsolute = true;
-		else if ( StartsWith( sOutPath, "ftp://", IGNORE_CASE ) )
+		else if ( StartsWith( sNormalizedPath, "http://" ) )
 			bAbsolute = true;
-		else if ( (sOutPath.length() >= 3) && (sOutPath[1] == ':') && (sOutPath[2] == '/' || sOutPath[2] == '\\') )
+		else if ( StartsWith( sNormalizedPath, "ftp://" ) )
+			bAbsolute = true;
+		else if ( (sNormalizedPath.length() >= 3)
+				&& (sNormalizedPath[1] == ':')
+				&& (sNormalizedPath[2] == '/' || sNormalizedPath[2] == '\\') )
 			bAbsolute = true;
 	}
 
@@ -475,5 +499,9 @@ CFileManager::GetSystemPath( string& sOutPath, const string& sNormalizedPath )
 	if ( !bAbsolute )
 	{
 		sOutPath = GetPathToRootDir() + sNormalizedPath;
+	}
+	else
+	{
+		sOutPath = sNormalizedPath;
 	}
 }

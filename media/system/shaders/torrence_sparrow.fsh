@@ -1,7 +1,7 @@
 
 //----------------------------------------------------------
 // vertex inputs
-varying vec3 v_Pos;
+varying vec3 v_Position;
 varying vec2 v_TexCoord;
 
 //----------------------------------------------------------
@@ -13,6 +13,7 @@ uniform sampler2D s_NormalTex;
 // uniforms
 uniform vec4 u_ViewPos;			// X,Y,Z,undef
 uniform vec4 u_LightPos;		// X,Y,Z,undef
+uniform vec4 u_LightColor;		// 
 
 
 //==========================================================
@@ -127,7 +128,7 @@ vec3 BRDF2_ts_nphong(vec3 vN, vec3 vN2, vec3 vL, vec3 vV, vec3 Cd, vec3 Cs, floa
 
 //----------------------------------------------------------
 // this is the Torrance-Sparrow model but using the Beckmann distribution
-vec3 BRDF_ts_beckmann(vec3 vN, vec3 vL, vec3 vV, vec3 Cd, vec3 Cs, float m=0.22, float F0=0.2)
+void BRDF_ts_beckmann(out vec3 oD, out vec3 oS, vec3 vN, vec3 vL, vec3 vV, vec3 Cd, vec3 Cs, float m=0.22, float F0=0.2)
 {
 	// reflect hack when view vector is occluded
 	// (might disable this, doesn't seem to be needed)
@@ -176,18 +177,20 @@ vec3 BRDF_ts_beckmann(vec3 vN, vec3 vL, vec3 vV, vec3 Cd, vec3 Cs, float m=0.22,
 	// which makes the final result scaled by pi.
 	// We do this to keep the output intensity range
 	// at a level which is more "familiar".
-	vec3 res = Cd * fDiff + M_PI * Cs * fSpec;
-	return res;
+	oD = (Cd * fDiff);
+	oS = (M_PI * Cs * fSpec);
 }
 
 //----------------------------------------------------------
 // optional variant (self shadowing factor)
 // vN is the shade normal (from a bump/normal map)
 // vN2 represents the normalized interpolated vertex normal
-vec3 BRDF2_ts_beckmann(vec3 vN, vec3 vN2, vec3 vL, vec3 vV, vec3 Cd, vec3 Cs, float m=0.22, float F0=0.2)
+void BRDF2_ts_beckmann(out vec3 oD, out vec3 oS, vec3 vN, vec3 vN2, vec3 vL, vec3 vV, vec3 Cd, vec3 Cs, float m=0.22, float F0=0.2)
 {
-	vec3 res = BRDF_ts_beckmann(vN, vL, vV, Cd, Cs, m, F0);
-	return saturate(4.0*dot(vL, vN2)) * res;
+	BRDF_ts_beckmann(oD, oS, vN, vL, vV, Cd, Cs, m, F0);
+	float s = saturate(4.0*dot(vL, vN2));
+	oD *= s;
+	oS *= s;
 }
 
 //----------------------------------------------------------
@@ -349,32 +352,47 @@ vec4 linear_to_gamma( vec4 color, float ex=2.2 )
 // main
 void main()
 {
-	//vec4 diffuse = texture2D( s_DiffuseTex, v_TexCoord );
-	vec4 diffuse = vec4(1.0);
+	vec4 diffuse = texture2D( s_DiffuseTex, v_TexCoord );
 
-	vec3 normal = texture2D( s_NormalTex, v_TexCoord ).rgb;
-	vec3 N = normalize(2.0*normal - 1.0);
+	vec3 V = normalize( u_ViewPos.xyz - v_Position );
 
-	vec3 L = normalize( u_LightPos.xyz - v_Pos );
-	float NdotL = saturate(dot( N, L ));
 
-	vec3 V = normalize( u_ViewPos.xyz - v_Pos );
+	vec3 N = texture2D( s_NormalTex, v_TexCoord ).rgb;
+	N = ( 2.0 * N ) - 1.0;
 
-	float desat = 2.0*(diffuse.r + diffuse.g + diffuse.b)/3.0;
+	//N = normalize(N - 0.05*V);
 
-	float kSpec = desat*0.18;
-	float kRough = 0.3;
-	float kShadow = 0.2;
 
-	//diffuse = linear_to_gamma( diffuse, 1.4 );
-	//diffuse *= 1.4;
+	vec3 L = (u_LightPos.xyz - v_Position);
+	//float Atten = 1.0/length(u_LightPos.xyz);
+	float Atten = 1.0/length(L);
+	L = normalize(L);
 
-	//diffuse = pow(diffuse, 2.2);
+	diffuse.r = pow( diffuse.r, vec3(1.0/1.05) );
+	diffuse.g = pow( diffuse.g, vec3(1.0/1.15) );
+	diffuse.b = pow( diffuse.b, vec3(1.0/1.10) );
+	diffuse.rgb *= 1.4;
+	diffuse.rgb = pow(diffuse.rgb, vec3(2.2));
 
-	vec4 spec = vec4(kSpec, kSpec, kSpec, 1.0);
-	diffuse.rgb = BRDF_ts_beckmann(N, L, V, diffuse.rgb, spec.rgb, kRough, kShadow);
+	//float desat = 2.0*(diffuse.r + diffuse.g + diffuse.b)/3.0;
+	float desat = 0.80;
+	float kSpec = 0.18*desat*u_LightColor.a;
+	float kRough = 0.34;
+	float kShadow = 0.3;
 
-	//diffuse = pow(diffuse, 1.0/2.2);
+	//Cs = pow( Cs, 4.4 ) * 1000.0;
+	vec3 Cd = 1.25*(Atten * u_LightColor.rgb * diffuse.rgb);
+	vec3 Cs = 0.50*vec3(kSpec);
+
+	vec3 Bd;
+	vec3 Bs;
+	BRDF_ts_beckmann(Bd, Bs, N, L, V, Cd, Cs, kRough, kShadow);
+	diffuse.rgb = Bd;
+	diffuse.a *= Bs;
+
+	//diffuse.a = 0.5*max(0.0, dot(N, L));
+
+	//diffuse.rgba = pow(diffuse.rgba, vec4(1.0/2.2) );
 
 	// output color.
 	gl_FragColor = diffuse;

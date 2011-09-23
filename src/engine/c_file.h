@@ -13,7 +13,7 @@ class E_API CFile
 	// to open/close files, use FileManager.
 	friend class CFileManager;
 	virtual ~CFile();
-	CFile();
+	CFile( const string& sCleanPath );
 public:
 
 	// returns the sanitized pathname.
@@ -28,10 +28,12 @@ public:
 	void			Seek( PxU64 uiPos );
 	void			Read( void* pDst, PxU32 uiNumBytes );
 	void			Write( const void* pSrc, PxU32 uiNumBytes );
+	bool			IsOpen() const;
+	void			Close();
 
 private:
 	// internal FileManager-only interface.
-	static CFile*	NewFromMemory( const string& sCleanPath, char* pMem, PxU64 uiMemSize, bool bOwnMem );
+	void			InitFromMemory( char* pMem, PxU64 uiMemSize, bool bOwnMem );
 
 	E_IMPL( CFile );
 };

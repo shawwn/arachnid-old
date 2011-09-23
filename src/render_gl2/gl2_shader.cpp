@@ -97,9 +97,9 @@ GL2Shader_impl::~GL2Shader_impl()
 
 //---------------------------------------------------------------------------
 GL2Shader_impl::GL2Shader_impl()
-: hProgram( NULL_GL_HANDLE )
-, hVertShader( NULL_GL_HANDLE )
-, hFragShader( NULL_GL_HANDLE )
+: hProgram( GLNULL )
+, hVertShader( GLNULL )
+, hFragShader( GLNULL )
 , bFailed( false )
 {
 }
@@ -322,6 +322,15 @@ GL2Shader_impl::InitParams()
 	InitEngineParam( program, GL_FLOAT_MAT4, GL2Shader::EP_MODEL_VIEW_PROJECTION_MATRIX, GL2_MODEL_VIEW_PROJECTION_MATRIX_NAME );
 	InitEngineParam( program, GL_FLOAT_VEC4, GL2Shader::EP_VIEW_POS, GL2_VIEW_POS_NAME );
 	InitEngineParam( program, GL_FLOAT_VEC4, GL2Shader::EP_LIGHT_POS, GL2_LIGHT_POS_NAME );
+	InitEngineParam( program, GL_FLOAT_VEC4, GL2Shader::EP_LIGHT_COLOR, GL2_LIGHT_COLOR_NAME );
+	InitEngineParam( program, GL_FLOAT_VEC4, GL2Shader::EP_BLUR_DIRECTION, GL2_BLUR_DIRECTION_NAME );
+	InitEngineParam( program, GL_FLOAT_VEC4, GL2Shader::EP_BLUR_WEIGHTS_R, GL2_BLUR_WEIGHTS_R_NAME );
+	InitEngineParam( program, GL_FLOAT_VEC4, GL2Shader::EP_BLUR_WEIGHTS_G, GL2_BLUR_WEIGHTS_G_NAME );
+	InitEngineParam( program, GL_FLOAT_VEC4, GL2Shader::EP_BLUR_WEIGHTS_B, GL2_BLUR_WEIGHTS_B_NAME );
+	InitEngineParam( program, GL_FLOAT_VEC4, GL2Shader::EP_BLUR_OFFSETS_R, GL2_BLUR_OFFSETS_R_NAME );
+	InitEngineParam( program, GL_FLOAT_VEC4, GL2Shader::EP_BLUR_OFFSETS_G, GL2_BLUR_OFFSETS_G_NAME );
+	InitEngineParam( program, GL_FLOAT_VEC4, GL2Shader::EP_BLUR_OFFSETS_B, GL2_BLUR_OFFSETS_B_NAME );
+	InitEngineParam( program, GL_FLOAT_VEC4, GL2Shader::EP_BLUR_CENTER_TAP_WEIGHT, GL2_BLUR_CENTER_TAP_WEIGHT_NAME );
 #if 0
 	vUniformLocations[ GL2Shader::EP_DEBUG0 ] = InitEngineParam( program, GL2_DEBUG0_NAME, GL_FLOAT_VEC4 );
 	vUniformLocations[ GL2Shader::EP_DEBUG1 ] = InitEngineParam( program, GL2_DEBUG1_NAME, GL_FLOAT_VEC4 );
@@ -338,6 +347,7 @@ GL2Shader_impl::InitParams()
 	uiSamplersUsed = 0;
 	InitEngineSampler( program,	GL_SAMPLER_2D,	GL2_TEX_DIFFUSE,	GL2_TEX_DIFFUSE_NAME );
 	InitEngineSampler( program,	GL_SAMPLER_2D,	GL2_TEX_NORMAL,		GL2_TEX_NORMAL_NAME );
+	InitEngineSampler( program,	GL_SAMPLER_2D,	GL2_TEX_CURRENT,	GL2_TEX_CURRENT_NAME );
 }
 
 //===========================================================================
@@ -384,8 +394,11 @@ GL2Shader::CreateShader( const char* sVertShader, const char* sFragShader )
 
 //---------------------------------------------------------------------------
 GL2Shader*
-GL2Shader::CreateShaderFromFile( const string& sPath )
+GL2Shader::CreateShaderFromFile( const string& sDirtyPath )
 {
+	// remove any file extension.
+	string sPath( Path_StripExtension(sDirtyPath) );
+
 	printf( "Loading shader '%s'...\n", sPath.c_str() ); 
 	// an example of 'sPath' might be:
 	//
@@ -414,7 +427,7 @@ GLuint
 GL2Shader::GetGLHandle( GL2Shader* pShader )
 {
 	if ( pShader == NULL )
-		return NULL_GL_HANDLE;
+		return GLNULL;
 
 	return pShader->m.hProgram;
 }
@@ -425,7 +438,7 @@ GL2Shader::Bind( GL2Shader* pShader )
 {
 	if ( pShader != s_pCurShader )
 	{
-		glUseProgram( pShader ? pShader->m.hProgram : NULL_GL_HANDLE );
+		glUseProgram( pShader ? pShader->m.hProgram : GLNULL );
 		CHECK_GL();
 		s_pCurShader = pShader;
 	}
@@ -435,8 +448,8 @@ GL2Shader::Bind( GL2Shader* pShader )
 void
 GL2Shader::Unbind()
 {
-	glUseProgram( NULL_GL_HANDLE );
-	s_pCurShader = NULL_GL_HANDLE;
+	glUseProgram( GLNULL );
+	s_pCurShader = GLNULL;
 }
 
 //---------------------------------------------------------------------------
@@ -555,7 +568,7 @@ DeleteProgram( GLuint& hProgram, GLuint& hVertShader, GLuint& hFragShader )
 	glDeleteShader( hFragShader );
 	glDeleteShader( hVertShader );
 
-	hProgram = NULL_GL_HANDLE;
-	hVertShader = NULL_GL_HANDLE;
-	hFragShader = NULL_GL_HANDLE;
+	hProgram = GLNULL;
+	hVertShader = GLNULL;
+	hFragShader = GLNULL;
 }

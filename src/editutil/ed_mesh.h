@@ -16,7 +16,7 @@ class ED_API EdMesh
 public:
 	~EdMesh();
 
-	static EdMesh*			LoadFromFile( CFileHandle& hFile );
+	static EdMesh*			LoadFromFile( const CFileHandle& hFile );
 
 	NVSHARE::MeshSystem*	GetMesh();
 

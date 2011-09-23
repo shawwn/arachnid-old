@@ -16,7 +16,8 @@ class GrImage
 public:
 	~GrImage();
 	static GrImage*	CreateImage( PxU32 uiWidth, PxU32 uiHeight );
-	static GrImage*	LoadImageFromFile( CFileHandle& cFile );
+	static GrImage*	LoadImageFromFile( const CFileHandle& cFile );
+	static GrImage*	LoadImageFromFile( const string& sPath );
 
 	PxU32			GetWidth();
 	PxU32			GetHeight();

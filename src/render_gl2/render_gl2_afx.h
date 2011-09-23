@@ -31,7 +31,7 @@
 //***************************************************************************
 
 // rather than passing 0 to GL functions, represent a "NULL GL handle" for clarity.
-const GLuint	NULL_GL_HANDLE(0);
+const GLuint	GLNULL(0);
 
 //***************************************************************************
 // Utilities

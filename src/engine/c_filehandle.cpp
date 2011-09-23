@@ -27,15 +27,16 @@ CFileHandle::CFileHandle( CFile* pFile )
 
 //---------------------------------------------------------------------------
 CFileHandle::CFileHandle( const CFileHandle& rhs )
-: m_pFile( rhs.m_pFile )
+: m_pFile( NULL )
 {
+	Acquire( rhs );
 }
 
 //---------------------------------------------------------------------------
 CFileHandle&
 CFileHandle::operator=( const CFileHandle& rhs )
 {
-	m_pFile = rhs.m_pFile;
+	Acquire( rhs );
 	return *this;
 }
 
@@ -49,15 +50,18 @@ CFileHandle::~CFileHandle()
 bool
 CFileHandle::IsOpen() const
 {
-	return (m_pFile != NULL);
+	return (m_pFile != NULL) && (m_pFile->IsOpen());
 }
 
 //---------------------------------------------------------------------------
 void
-CFileHandle::Close()
+CFileHandle::Close() const
 {
-	FileManager.CloseFile( m_pFile );
-	m_pFile = NULL;
+	if ( m_pFile )
+	{
+		m_pFile->Close();
+		m_pFile = NULL;
+	}
 }
 
 //---------------------------------------------------------------------------
@@ -89,7 +93,7 @@ CFileHandle::GetFileMem() const
 
 //---------------------------------------------------------------------------
 PxU64
-CFileHandle::GetSize()
+CFileHandle::GetSize() const
 {
 	if ( !IsOpen() )
 		return 0;
@@ -99,7 +103,7 @@ CFileHandle::GetSize()
 
 //---------------------------------------------------------------------------
 PxU64
-CFileHandle::GetPos()
+CFileHandle::GetPos() const
 {
 	E_ASSERT( IsOpen() );
 	if ( !IsOpen() )
@@ -110,7 +114,7 @@ CFileHandle::GetPos()
 
 //---------------------------------------------------------------------------
 void
-CFileHandle::Seek( PxU64 uiPos )
+CFileHandle::Seek( PxU64 uiPos ) const
 {
 	E_ASSERT( IsOpen() );
 	if ( !IsOpen() )
@@ -121,7 +125,7 @@ CFileHandle::Seek( PxU64 uiPos )
 
 //---------------------------------------------------------------------------
 void
-CFileHandle::Read( void* pDst, PxU32 uiNumBytes )
+CFileHandle::Read( void* pDst, PxU32 uiNumBytes ) const
 {
 	E_ASSERT( IsOpen() );
 	if ( !IsOpen() )
@@ -132,11 +136,29 @@ CFileHandle::Read( void* pDst, PxU32 uiNumBytes )
 
 //---------------------------------------------------------------------------
 void
-CFileHandle::Write( const void* pSrc, PxU32 uiNumBytes )
+CFileHandle::Write( const void* pSrc, PxU32 uiNumBytes ) const
 {
 	E_ASSERT( IsOpen() );
 	if ( !IsOpen() )
 		return;
 
 	return m_pFile->Write( pSrc, uiNumBytes );
+}
+
+//---------------------------------------------------------------------------
+void
+CFileHandle::Acquire( const CFileHandle& rhs ) const
+{
+	// don't acquire from ourselves!
+	if ( rhs.m_pFile == m_pFile )
+		return;
+
+	// transfer ownership from rhs.
+	{
+		if ( m_pFile != NULL )
+			Close();
+
+		m_pFile = rhs.m_pFile;
+		rhs.m_pFile = NULL;
+	}
 }

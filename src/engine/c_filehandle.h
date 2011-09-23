@@ -26,7 +26,7 @@ public:
 	bool			IsOpen() const;
 
 	// closes the opened file.
-	void			Close();
+	void			Close() const;
 
 	// returns the underlying CFile pointer.
 	CFile*			GetFile() const;
@@ -36,15 +36,17 @@ public:
 
 	// a pointer to the file, in memory, and NULL-terminated.
 	char*			GetFileMem() const;
-	PxU64			GetSize();
+	PxU64			GetSize() const;
 
 	// quick'n'dirty I/O.
-	PxU64			GetPos();
-	void			Seek( PxU64 uiPos );
-	void			Read( void* pDst, PxU32 uiNumBytes );
-	void			Write( const void* pSrc, PxU32 uiNumBytes );
+	PxU64			GetPos() const;
+	void			Seek( PxU64 uiPos ) const;
+	void			Read( void* pDst, PxU32 uiNumBytes ) const;
+	void			Write( const void* pSrc, PxU32 uiNumBytes ) const;
 
 private:
-	CFile*			m_pFile;
+	void			Acquire( const CFileHandle& rhs ) const;
+
+	mutable CFile*	m_pFile;
 };
 

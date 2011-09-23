@@ -58,3 +58,93 @@ E_INLINE void	Swap( _T& a, _T& b )
 	a = b;
 	b = c;
 }
+
+//===========================================================================
+// DeleteOnLeavingThisScope
+//===========================================================================
+template< typename T >
+class DeleteOnLeavingThisScope
+{
+public:
+	~DeleteOnLeavingThisScope();
+	DeleteOnLeavingThisScope( T* pObj );
+
+	operator	T*()		{ return m_pObj; }
+	operator	T*() const	{ return m_pObj; }
+private:
+	T*	m_pObj;
+};
+
+//---------------------------------------------------------------------------
+template< typename T >
+DeleteOnLeavingThisScope<T>::~DeleteOnLeavingThisScope()
+{
+	E_DELETE( m_pObj );
+}
+
+//---------------------------------------------------------------------------
+template< typename T >
+DeleteOnLeavingThisScope<T>::DeleteOnLeavingThisScope( T* pObj )
+: m_pObj( pObj )
+{
+}
+
+//===========================================================================
+// DeleteArrayOnLeavingThisScope
+//===========================================================================
+template< typename T >
+class DeleteArrayOnLeavingThisScope
+{
+public:
+	~DeleteArrayOnLeavingThisScope();
+	DeleteArrayOnLeavingThisScope( T* pArray );
+
+	operator	T*()		{ return m_pArray; }
+	operator	T*() const	{ return m_pArray; }
+private:
+	T*	m_pArray;
+};
+
+//---------------------------------------------------------------------------
+template< typename T >
+DeleteArrayOnLeavingThisScope<T>::~DeleteArrayOnLeavingThisScope()
+{
+	E_DELETE_ARRAY( m_pArray );
+}
+
+//---------------------------------------------------------------------------
+template< typename T >
+DeleteArrayOnLeavingThisScope<T>::DeleteArrayOnLeavingThisScope( T* pArray )
+: m_pArray( pArray )
+{
+}
+
+//===========================================================================
+// MemFreeOnLeavingThisScope
+//===========================================================================
+template< typename T >
+class MemFreeOnLeavingThisScope
+{
+public:
+	~MemFreeOnLeavingThisScope();
+	MemFreeOnLeavingThisScope( T* pBuffer );
+
+	operator	T*()		{ return m_pBuffer; }
+	operator	T*() const	{ return m_pBuffer; }
+private:
+	T*	m_pBuffer;
+};
+
+//---------------------------------------------------------------------------
+template< typename T >
+MemFreeOnLeavingThisScope<T>::~MemFreeOnLeavingThisScope()
+{
+	MemFree( m_pBuffer );
+}
+
+//---------------------------------------------------------------------------
+template< typename T >
+MemFreeOnLeavingThisScope<T>::MemFreeOnLeavingThisScope( T* pBuffer )
+: m_pBuffer( pBuffer )
+{
+}

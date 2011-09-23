@@ -29,7 +29,7 @@ public:
 	CEngine_impl();
 
 	void						LoadRendererDLLs();
-	bool						TryStartupRenderer( const char* sNameOfRenderer, PxU32 uiScreenWidth, PxU32 uiScreenHeight );
+	bool						TryStartupRenderer( const char* sNameOfRenderer, PxU32 uiScreenWidth, PxU32 uiScreenHeight, const GrCamera& cCam );
 
 
 	// renderer state.
@@ -40,7 +40,6 @@ public:
 	GrCamera					cCamera;
 
 	// timing/clock state.
-	PxU32						uiFullyLoadedAtTime;
 	PxU32						uiPrevTime;
 
 	// flags.
@@ -50,7 +49,6 @@ public:
 //---------------------------------------------------------------------------
 CEngine_impl::CEngine_impl()
 : bInitialized( false )
-, uiFullyLoadedAtTime( 0 )
 , uiPrevTime( 0 )
 {
 }
@@ -111,7 +109,7 @@ CEngine_impl::LoadRendererDLLs()
 
 //---------------------------------------------------------------------------
 bool
-CEngine_impl::TryStartupRenderer( const char* sNameOfRenderer, PxU32 uiScreenWidth, PxU32 uiScreenHeight )
+CEngine_impl::TryStartupRenderer( const char* sNameOfRenderer, PxU32 uiScreenWidth, PxU32 uiScreenHeight, const GrCamera& cCam )
 {
 	bool bSucceeded( false );
 
@@ -136,6 +134,7 @@ CEngine_impl::TryStartupRenderer( const char* sNameOfRenderer, PxU32 uiScreenWid
 			else
 			{
 				bSucceeded = true;
+				pRenderer->SetViewpoint( cCam );
 				break;
 			}
 		}
@@ -173,20 +172,21 @@ CEngine::Startup( PxU32 uiScreenWidth, PxU32 uiScreenHeight )
 	// determine our possible renderers.
 	m.LoadRendererDLLs();
 
+	// configure the camera.
+	m.cCamera = GrCamera(
+		MVec3(0.25F, 0.0F, 0.25F),
+		MVec3(0.0F, 0.0F, 0.0F),
+		MVec3(0.0F, 1.0F, 0.0F),
+		GrProjection( DegToRad(40.0F), (uiScreenWidth / (PxF32)uiScreenHeight), 0.02F, 1000.0F, 1000.0F ) );
+
 	// startup the "gl2" renderer only, for now.
-	if ( !m.TryStartupRenderer( "gl2", uiScreenWidth, uiScreenHeight ) )
+	if ( !m.TryStartupRenderer( "gl2", uiScreenWidth, uiScreenHeight, m.cCamera ) )
 	{
 		E_ASSERT( !"Failed to startup GL2 renderer." );
 		Shutdown();
 		return false;
 	}
 
-	// configure the camera.
-	m.cCamera = GrCamera(
-		MVec3(0.25F, 0.0F, 0.25F),
-		MVec3(0.0F, 0.0F, 0.0F),
-		MVec3(0.0F, 1.0F, 0.0F),
-		GrProjection( DegToRad(40.0F), (uiScreenWidth / (PxF32)uiScreenHeight), 0.02F ) );
 
 	return true;
 }
@@ -234,12 +234,8 @@ CEngine::Frame()
 	if ( !m.bInitialized )
 		return false;
 
-	if ( m.uiFullyLoadedAtTime <= 0 )
-		m.uiFullyLoadedAtTime = System.GetCurTime();
-
 	// update clocks / calculate time delta.
 	PxU32 uiCurTime = System.GetCurTime();
-	PxU32 uiTotalTime( m.uiFullyLoadedAtTime - uiCurTime );
 	PxU32 uiDeltaTime = ( (m.uiPrevTime == 0) ? 0 : (uiCurTime - m.uiPrevTime) );
 	PxF32 fDeltaTime = ( uiDeltaTime / 1000.0F );
 	m.uiPrevTime = uiCurTime;
@@ -256,11 +252,8 @@ CEngine::Frame()
 		E_ASSERT( pRenderer != NULL );
 		if ( pRenderer )
 		{
-			// set the viewpoint.
-			pRenderer->SetViewpoint( m.cCamera );
-
 			// update the renderer.
-			pRenderer->Frame( uiTotalTime, fDeltaTime );
+			pRenderer->Frame( uiCurTime, fDeltaTime );
 		}
 	}
 

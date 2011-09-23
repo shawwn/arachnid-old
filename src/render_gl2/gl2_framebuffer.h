@@ -28,6 +28,9 @@ public:
 	GL2FramebufferAttachment(	// the attachment:  GL_COLOR_ATTACHMENT0, GL_DEPTH_ATTACHMENT, GL_STENCIL_ATTACHMENT, etc.
 								GLenum						gl_eAttachType, 
 
+								// the target:  GL_TEXTURE_2D or GL_TEXTURE_RECTANGLE_ARB
+								GLenum						gl_eTarget, 
+
 								// the specified should be GL2_TEXTYPE_2D or GL_TEXTYPE_RENDERBUFFER.
 								// (it's necessary to specify this value, since pFBAttachableImage can be NULL.)
 								ETextureType				gl2_eTextype, 
@@ -41,6 +44,7 @@ public:
 
 	// accessors.
 	GLuint							GetGLHandle() const;
+	GLenum							GetGLTarget() const				{	return m_glTarget;		}
 	GLenum							GetGLAttachType() const			{	return m_glAttachType;	}
 	ETextureType					GetImageType() const			{	return m_eImageType;	}
 	GL2TextureBase*					GetImage() const				{	return m_pImage;		}
@@ -53,6 +57,7 @@ public:
 
 private:
 	GLenum							m_glAttachType;
+	GLenum							m_glTarget;
 	ETextureType					m_eImageType;
 	GL2TextureBase*					m_pImage;
 	PxU32							m_uiMiplevel;
@@ -67,10 +72,12 @@ class GL2Framebuffer
 	GL2Framebuffer();
 public:
 	~GL2Framebuffer();
+
 	static GL2Framebuffer*			CreateFramebuffer( PxU32 uiWidth, PxU32 uiHeight );
-	static void						Bind( GL2Framebuffer* pDrawFramebuffer,
-										GL2Framebuffer* pReadFramebuffer = NULL );
+
+	static void						Bind( GL2Framebuffer* pDrawFramebuffer, GL2Framebuffer* pReadFramebuffer = NULL );
 	static void						Unbind();
+	static void						VerifyBind( GL2Framebuffer* pDrawFramebuffer, GL2Framebuffer* pReadFramebuffer = NULL );
 
 	PxU32							GetWidth();
 	PxU32							GetHeight();

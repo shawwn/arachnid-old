@@ -84,6 +84,7 @@ struct SVec3
 {
 	SVec3()  { }
 	SVec3( const SVec3& rhs );
+	SVec3( PxF32 s );
 	SVec3( PxF32 x, PxF32 y, PxF32 z );
 
 	// assignment.
@@ -105,6 +106,37 @@ struct SVec3
 	PxF32			x;
 	PxF32			y;
 	PxF32			z;
+};
+
+//===========================================================================
+// SVec3
+//===========================================================================
+struct SVec3d
+{
+	SVec3d()  { }
+	SVec3d( const SVec3d& rhs );
+	SVec3d( PxF64 s );
+	SVec3d( PxF64 x, PxF64 y, PxF64 z );
+
+	// assignment.
+	SVec3d&			operator = ( const SVec3d& rhs )			{	Set( rhs.x, rhs.y, rhs.z );  return *this;				}
+
+	// accessors.
+	PxF64*			GetData()								{	return &this->x;										}
+	const PxF64*	GetData() const							{	return &this->x;										}
+
+	// setters.
+	void			Set( PxF64 x, PxF64 y, PxF64 z )		{	this->x = x;  this->y = y;  this->z = z;				}
+
+	// arithmetic operators.
+	SVec3d			operator + ( const SVec3d& rhs ) const	{	return SVec3d( (x + rhs.x), (y + rhs.y), (z + rhs.z) );	}
+	SVec3d			operator - ( const SVec3d& rhs ) const	{	return SVec3d( (x - rhs.x), (y - rhs.y), (z - rhs.z) );	}
+	friend SVec3d	operator *( PxF64 s, const SVec3d& vec ) {	return SVec3d( (s * vec.x), (s * vec.y), (s * vec.z) );	}
+
+	// member variables.
+	PxF64			x;
+	PxF64			y;
+	PxF64			z;
 };
 
 

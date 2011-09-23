@@ -21,7 +21,7 @@ public:
 	GrProjection();
 
 	// orthographic projection.
-	GrProjection( PxF32 left, PxF32 right, PxF32 bottom, PxF32 top, PxF32 zNear, PxF32 zFar = 10000.0F );
+	GrProjection( PxF32 left, PxF32 right, PxF32 bottom, PxF32 top, PxF32 zNear, PxF32 zFar );
 
 	// perspective projection.
 	GrProjection( PxF32 fovy, PxF32 aspect, PxF32 zNear, PxF32 farCull = 10000.0F, PxF32 zFar = 0.0F );

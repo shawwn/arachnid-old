@@ -13,8 +13,8 @@ public:
 	PxF32			MagSq() const;
 	PxF32			Mag() const;
 	PxF32			Dot( const MVec3& rhs ) const;
-	MVec3			Normalize();
-	PxF32			NormalizeFast();
+	MVec3			Normalized();
+	PxF32			Normalize();
 
 	// assignment.
 	MVec3&			operator = ( const MVec3& rhs )			{	Set( rhs.GetX(), rhs.GetY(), rhs.GetZ() );  return *this;	}
@@ -36,6 +36,11 @@ public:
 	MVec3			operator + ( const MVec3& rhs ) const	{	return MVec3( (GetX() + rhs.GetX()), (GetY() + rhs.GetY()), (GetZ() + rhs.GetZ()) );	}
 	MVec3			operator - ( const MVec3& rhs ) const	{	return MVec3( (GetX() - rhs.GetX()), (GetY() - rhs.GetY()), (GetZ() - rhs.GetZ()) );	}
 	friend MVec3	operator *( PxF32 s, const MVec3& vec ) {	return MVec3( (s * vec.GetX()), (s * vec.GetY()), (s * vec.GetZ()) );					}
+
+	MVec3&			operator +=( const MVec3& rhs )			{	_data[0] += rhs._data[0];	_data[1] += rhs._data[1];	_data[2] += rhs._data[2];	return *this;	}
+	MVec3&			operator -=( const MVec3& rhs )			{	_data[0] -= rhs._data[0];	_data[1] -= rhs._data[1];	_data[2] -= rhs._data[2];	return *this;	}
+	MVec3&			operator *=( const MVec3& rhs )			{	_data[0] *= rhs._data[0];	_data[1] *= rhs._data[1];	_data[2] *= rhs._data[2];	return *this;	}
+	MVec3&			operator *=( PxF32 s )					{	_data[0] *= s;				_data[1] *= s;				_data[2] *= s;				return *this;	}
 
 	// constants.
 	static const MVec3	Zero;

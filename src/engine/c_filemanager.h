@@ -16,10 +16,15 @@ class E_API CFileManager
 public:
 	~CFileManager();
 
-	CFileHandle&	OpenFile( const string& sPath, const char* sMode = "rb" ); // todo: refactor 'sMode' into bitflags.
-	void			CloseFile( CFile*& pFile );
+	CFileHandle		OpenFile( const string& sPath, const char* sMode = "rb" ); // todo: refactor 'sMode' into bitflags.
 
-	PxU32			FindFiles( StringList& vResults, const string& sPath, const string& sPattern );
+	// returns whether we're case sensitive.
+	bool			ShouldIgnoreCase();
+
+	// joins two paths.  E.g:  FileManager.Join("media/textures", "rock.jpg") => "media/textures/rock.jpg"
+	string			Join( const string& sBase, const string& sExt );
+
+	PxU32			FindFiles( StringList& vResults, const string& sPath, const string& sPattern = "*" );
 
 	void			NormalizePath( string& sOutPath, const string& sPath );
 	string			NormalizePath( const string& sPath );

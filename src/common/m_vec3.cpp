@@ -53,3 +53,30 @@ MVec3::Dot( const MVec3& rhs ) const
 		+ (_data[1] * rhs._data[1])
 		+ (_data[2] * rhs._data[2]);
 }
+
+//---------------------------------------------------------------------------
+MVec3
+MVec3::Normalized()
+{
+	MVec3 v3Ret(*this);
+	v3Ret.Normalize();
+	return v3Ret;
+}
+
+//---------------------------------------------------------------------------
+PxF32
+MVec3::Normalize()
+{
+	PxF32 x = GetX();
+	PxF32 y = GetY();
+	PxF32 z = GetZ();
+	PxF32 len = Sqrt(x*x + y*y + z*z);
+	if ( len != 0.0F )
+	{
+		PxF32 invLen = 1.0F/len;
+		_data[0] = (x * invLen);
+		_data[1] = (y * invLen);
+		_data[2] = (z * invLen);
+	}
+	return len;
+}

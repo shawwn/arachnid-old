@@ -12,6 +12,7 @@
 // Math library declarations.
 //***************************************************************************
 static void _glhLookAtf2(PxF32 *matrix, PxF32 *eyePosition3D, PxF32 *center3D, PxF32 *upVector3D);
+static void _glhLookAtf2_calcSideDir(PxF32 *side, PxF32 *eyePosition3D, PxF32 *center3D, PxF32 *upVector3D);
 
 //===========================================================================
 // GrCamera - Private state.
@@ -80,6 +81,7 @@ GrCamera_impl::GrCamera_impl( const MVec3& pos, const MVec3& lookAt, const MVec3
 , cProj		( proj )
 , bDirty	( true )
 {
+	v3LookDir.Normalize();
 }
 
 //===========================================================================
@@ -136,9 +138,11 @@ GrCamera::RecomputeMatrix() const
 {
 	assert( m.bDirty );
 
-	MVec3 center( m.v3Pos + m.v3LookDir );
+	m.cViewMat = MMat4x4::Identity;
 	_glhLookAtf2( (PxF32*)m.cViewMat.GetData(),
-		(PxF32*)m.v3Pos.GetData(), center.GetData(), (PxF32*)m.v3UpDir.GetData() );
+		(PxF32*)m.v3Pos.GetData(),
+		( m.v3Pos + m.v3LookDir ).GetData(),
+		(PxF32*)m.v3UpDir.GetData() );
 }
 
 //---------------------------------------------------------------------------
@@ -159,7 +163,22 @@ GrCamera::SetUpDir( const MVec3& up )
 void
 GrCamera::SetLookDir( const MVec3& look )
 {
-	m.v3LookDir = look;	m.bDirty = true;
+	m.v3LookDir = look;	
+	m.v3LookDir.Normalize();
+	m.bDirty = true;
+}
+
+//---------------------------------------------------------------------------
+void
+GrCamera::LookAt( const MVec3& lookAt )
+{
+	MVec3 v3Dir( lookAt - GetPos() );
+	if ( v3Dir.MagSq() != 0.0F )
+	{
+		m.v3LookDir = v3Dir;	
+		m.v3LookDir.Normalize();
+		m.bDirty = true;
+	}
 }
 
 //---------------------------------------------------------------------------
@@ -174,6 +193,18 @@ const MVec3&
 GrCamera::GetPos() const
 {
 	return m.v3Pos;
+}
+
+//---------------------------------------------------------------------------
+MVec3
+GrCamera::CalcSideDir() const
+{
+	PxF32 side[3];
+	_glhLookAtf2_calcSideDir( side,
+		(PxF32*)m.v3Pos.GetData(),
+		( m.v3Pos + m.v3LookDir ).GetData(),
+		(PxF32*)m.v3UpDir.GetData() );
+	return MVec3(side[0], side[1], side[2]);
 }
 
 //---------------------------------------------------------------------------
@@ -347,4 +378,22 @@ static void _glhLookAtf2(PxF32 *matrix, PxF32 *eyePosition3D, PxF32 *center3D, P
 	_glhTranslatef2(resultMatrix, -eyePosition3D[0], -eyePosition3D[1], -eyePosition3D[2]);
 	
 	memcpy(matrix, resultMatrix, 16*sizeof(PxF32));
+}
+
+//---------------------------------------------------------------------------
+static void _glhLookAtf2_calcSideDir(PxF32 *side, PxF32 *eyePosition3D, PxF32 *center3D, PxF32 *upVector3D)
+{
+	PxF32 forward[3], up[3];
+
+	forward[0]=center3D[0]-eyePosition3D[0];
+	forward[1]=center3D[1]-eyePosition3D[1];
+	forward[2]=center3D[2]-eyePosition3D[2];
+	_NormalizeVectorFLOAT_2(forward);
+
+	//Side = forward x up
+	_ComputeNormalOfPlaneFLOAT_2(side, forward, upVector3D);
+	_NormalizeVectorFLOAT_2(side);
+
+	//Recompute up as: up = side x forward
+	_ComputeNormalOfPlaneFLOAT_2(up, side, forward);
 }

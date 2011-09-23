@@ -75,9 +75,9 @@ GrImage::~GrImage()
 
 //---------------------------------------------------------------------------
 GrImage*
-GrImage::LoadImageFromFile( CFileHandle& cFile )
+GrImage::LoadImageFromFile( const CFileHandle& cFile )
 {
-	E_ASSERT( cFile.IsOpen() );
+	//E_ASSERT( cFile.IsOpen() );
 	if ( !cFile.IsOpen() )
 		return NULL;
 
@@ -138,6 +138,13 @@ GrImage::LoadImageFromFile( CFileHandle& cFile )
 	pImg->m.pPixels = bits;
 	pImg->m.pDib = dib;
 	return pImg;
+}
+
+//---------------------------------------------------------------------------
+GrImage*
+GrImage::LoadImageFromFile( const string& sPath )
+{
+	return LoadImageFromFile( FileManager.OpenFile(sPath) );
 }
 
 //---------------------------------------------------------------------------

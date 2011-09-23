@@ -14,7 +14,9 @@ class CFile_impl
 {
 public:
 	~CFile_impl();
-	CFile_impl();
+	CFile_impl( const string& sCleanPath );
+
+	void			Close();
 
 	// the sanitized path name.
 	string			sPath;
@@ -33,17 +35,28 @@ public:
 //---------------------------------------------------------------------------
 CFile_impl::~CFile_impl()
 {
-	if ( bOwnMem )
-		MemFree( pMem );
+	Close();
 }
 
 //---------------------------------------------------------------------------
-CFile_impl::CFile_impl()
-: uiSize( 0 )
+CFile_impl::CFile_impl( const string& sCleanPath )
+: sPath( sCleanPath )
+, uiSize( 0 )
 , uiPos( 0 )
 , pMem( NULL )
 , bOwnMem( false )
 {
+}
+
+//---------------------------------------------------------------------------
+void
+CFile_impl::Close()
+{
+	if ( bOwnMem )
+	{
+		MemFree( pMem );
+		pMem = NULL;
+	}
 }
 
 //===========================================================================
@@ -57,21 +70,22 @@ CFile::~CFile()
 }
 
 //---------------------------------------------------------------------------
-CFile::CFile()
-: E_IMPL_NEW(CFile)
+CFile::CFile( const string& sCleanPath )
+: E_IMPL_NEW(CFile, sCleanPath)
 {
 }
 
 //---------------------------------------------------------------------------
-CFile*
-CFile::NewFromMemory( const string& sCleanPath, char* pMem, PxU64 uiMemSize, bool bOwnMem )
+void
+CFile::InitFromMemory( char* pMem, PxU64 uiMemSize, bool bOwnMem )
 {
-	CFile* pFile = E_NEW(CFile);
-	pFile->m.sPath = sCleanPath;
-	pFile->m.pMem = pMem;
-	pFile->m.uiSize = uiMemSize;
-	pFile->m.bOwnMem = bOwnMem;
-	return pFile;
+	Close();
+	E_ASSERT( m.pMem == NULL );
+
+	m.pMem = pMem;
+	m.uiPos = 0;
+	m.uiSize = uiMemSize;
+	m.bOwnMem = bOwnMem;
 }
 
 //---------------------------------------------------------------------------
@@ -117,7 +131,11 @@ CFile::Read( void* pDst, PxU32 uiNumBytes )
 	E_ASSERT( (GetPos() + uiNumBytes) <= GetSize() );
 	E_ASSERT( GetPos() <= GetSize() );
 
-	byte* pSrc		= (byte*)GetFileMem();
+	byte* pSrc = (byte*)GetFileMem();
+	E_ASSERT( pSrc != NULL );
+	if ( !pSrc )
+		return;
+
 	PxU64 uiSrc		= Min( GetSize(), GetPos() );
 	PxU64 uiSrcEnd	= Min( GetSize(), GetPos() + uiNumBytes );
 	PxU64 uiCount	= (uiSrcEnd - uiSrc);
@@ -136,4 +154,18 @@ CFile::Write( const void* pSrc, PxU32 uiNumBytes )
 {
 	E_UNREF_PARAM2( pSrc, uiNumBytes );
 	E_ASSERT( !"todo." );
+}
+
+//---------------------------------------------------------------------------
+bool
+CFile::IsOpen() const
+{
+	return (m.pMem != NULL);
+}
+
+//---------------------------------------------------------------------------
+void
+CFile::Close()
+{
+	m.Close();
 }
