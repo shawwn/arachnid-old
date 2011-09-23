@@ -6,7 +6,7 @@
 SINGLETON_INIT( CFileManager );
 
 //***************************************************************************
-// Declarations
+// Definitions
 //***************************************************************************
 typedef map<string,	CFile*>		PathToFileMap;
 

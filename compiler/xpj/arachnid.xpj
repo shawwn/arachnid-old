@@ -163,6 +163,8 @@
 				<SearchPaths type="header">
 					../../src
 					../../ext
+					../../ext/luajit/include
+					../../ext/libjson/include
 				</SearchPaths>
 
 				<Files name="engine" root="../../src/engine" type="source">
@@ -184,12 +186,22 @@
 				<SearchPaths type="library">
 					../../ext/anttweakbar/lib
 				</SearchPaths>
+				<SearchPaths type="library" platform="win32">
+					../../ext/luajit/lib/x86
+					../../ext/libjson/lib/x86
+				</SearchPaths>
+				<SearchPaths type="library" platform="win64">
+					../../ext/luajit/lib/x64
+					../../ext/libjson/lib/x64
+				</SearchPaths>
 				<Libraries>
 					winmm.lib
 					dbghelp.lib
 					winmm.lib
 					comctl32.lib
 					shlwapi.lib
+					lua51.lib
+					libjson.lib
 				</Libraries>
 				<Libraries platform="win32">
 					anttweakbar.lib

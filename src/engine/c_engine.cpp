@@ -1,6 +1,7 @@
 #include "engine_afx.h"
 #include "c_engine.h"
 
+#include "engine/c_tests.h"
 #include "engine/c_system.h"
 #include "engine/c_filemanager.h"
 #include "engine/i_renderer.h"
@@ -164,11 +165,16 @@ CEngine::~CEngine()
 bool
 CEngine::Startup( PxU32 uiScreenWidth, PxU32 uiScreenHeight )
 {
+	E_UNREF_PARAM2( uiScreenWidth, uiScreenHeight );
+
 	E_ASSERT( !m.bInitialized );
 	if ( m.bInitialized )
 		return false;
 	m.bInitialized = true;
 
+#if 0
+	return Tests.RunAll();
+#else
 	// determine our possible renderers.
 	m.LoadRendererDLLs();
 
@@ -187,8 +193,8 @@ CEngine::Startup( PxU32 uiScreenWidth, PxU32 uiScreenHeight )
 		return false;
 	}
 
-
 	return true;
+#endif
 }
 
 //---------------------------------------------------------------------------

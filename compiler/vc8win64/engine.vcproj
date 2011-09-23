@@ -39,7 +39,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/fp:fast /W4 /WX /MDd /Zi "
 				Optimization="4"
-				AdditionalIncludeDirectories="&quot;../../src&quot;;&quot;../../ext&quot;;"
+				AdditionalIncludeDirectories="&quot;../../src&quot;;&quot;../../ext&quot;;&quot;../../ext/luajit/include&quot;;&quot;../../ext/libjson/include&quot;;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;UNICODE=1;ENGINE_EXPORTS;_DEBUG;"
 				ExceptionHandling="1"
 				UsePrecompiledHeader="2"
@@ -58,9 +58,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/DEBUG /DEBUG "
-				AdditionalDependencies="&quot;winmm.lib&quot; &quot;dbghelp.lib&quot; &quot;winmm.lib&quot; &quot;comctl32.lib&quot; &quot;shlwapi.lib&quot; &quot;anttweakbar64.lib&quot; "
+				AdditionalDependencies="&quot;winmm.lib&quot; &quot;dbghelp.lib&quot; &quot;winmm.lib&quot; &quot;comctl32.lib&quot; &quot;shlwapi.lib&quot; &quot;lua51.lib&quot; &quot;libjson.lib&quot; &quot;anttweakbar64.lib&quot; "
 				OutputFile="$(OutDir)/engineDEBUG_x64.dll"
-				AdditionalLibraryDirectories="&quot;../../ext/anttweakbar/lib&quot;;"
+				AdditionalLibraryDirectories="&quot;../../ext/anttweakbar/lib&quot;;&quot;../../ext/luajit/lib/x64&quot;;&quot;../../ext/libjson/lib/x64&quot;;"
 				ProgramDatabaseFile="$(OutDir)/engineDEBUG_x64.dll.pdb"
 				GenerateMapFile="true"
 				MapFileName="$(OutDir)/engineDEBUG_x64.dll.map"
@@ -118,7 +118,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/fp:fast /WX /W4 /MD /Zi /O2 "
 				Optimization="4"
-				AdditionalIncludeDirectories="&quot;../../src&quot;;&quot;../../ext&quot;;"
+				AdditionalIncludeDirectories="&quot;../../src&quot;;&quot;../../ext&quot;;&quot;../../ext/luajit/include&quot;;&quot;../../ext/libjson/include&quot;;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;UNICODE=1;ENGINE_EXPORTS;NDEBUG;"
 				ExceptionHandling="1"
 				UsePrecompiledHeader="2"
@@ -137,9 +137,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/DEBUG "
-				AdditionalDependencies="&quot;winmm.lib&quot; &quot;dbghelp.lib&quot; &quot;winmm.lib&quot; &quot;comctl32.lib&quot; &quot;shlwapi.lib&quot; &quot;anttweakbar64.lib&quot; "
+				AdditionalDependencies="&quot;winmm.lib&quot; &quot;dbghelp.lib&quot; &quot;winmm.lib&quot; &quot;comctl32.lib&quot; &quot;shlwapi.lib&quot; &quot;lua51.lib&quot; &quot;libjson.lib&quot; &quot;anttweakbar64.lib&quot; "
 				OutputFile="$(OutDir)/engine_x64.dll"
-				AdditionalLibraryDirectories="&quot;../../ext/anttweakbar/lib&quot;;"
+				AdditionalLibraryDirectories="&quot;../../ext/anttweakbar/lib&quot;;&quot;../../ext/luajit/lib/x64&quot;;&quot;../../ext/libjson/lib/x64&quot;;"
 				ProgramDatabaseFile="$(OutDir)/engine_x64.dll.pdb"
 				GenerateMapFile="true"
 				MapFileName="$(OutDir)/engine_x64.dll.map"
@@ -211,6 +211,22 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\engine\c_lua.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\engine\c_lua.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\engine\c_luacontext.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\engine\c_luacontext.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\engine\c_modelresource.cpp"
 				>
 			</File>
@@ -244,6 +260,14 @@
 			</File>
 			<File
 				RelativePath="..\..\src\engine\c_system.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\engine\c_tests.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\engine\c_tests.h"
 				>
 			</File>
 			<File
