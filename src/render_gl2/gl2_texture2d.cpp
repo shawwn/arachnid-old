@@ -222,7 +222,7 @@ GL2Texture2D::~GL2Texture2D()
 
 //---------------------------------------------------------------------------
 void
-GL2Texture2D::Bind( PxU32 uiTexUnit, GL2TextureBase* pTexBase )
+GL2Texture2D::Bind( PxU32 uiTexUnit, GL2TextureBase* pTexBase, bool bIsDepth )
 {
 	// sanity check the texunit.
 	E_ASSERT( uiTexUnit < 16 );
@@ -267,6 +267,12 @@ GL2Texture2D::Bind( PxU32 uiTexUnit, GL2TextureBase* pTexBase )
 		glTexParameterf(glTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		CHECK_GL();
 		glTexParameterf(glTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		if ( bIsDepth )
+		{
+			glTexParameteri( glTarget, GL_DEPTH_TEXTURE_MODE_ARB, GL_LUMINANCE );
+			glTexParameteri( glTarget, GL_TEXTURE_COMPARE_MODE_ARB, GL_NONE );
+		}
 	}
 
 	// verify GL is okay.

@@ -55,4 +55,6 @@
 #define GL2_TEX_NORMAL_NAME						"s_NormalTex"
 #define GL2_TEX_CURRENT							3
 #define GL2_TEX_CURRENT_NAME					"s_CurrentTex"
+#define GL2_TEX_DEPTH							4
+#define GL2_TEX_DEPTH_NAME						"s_DepthTex"
 

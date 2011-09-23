@@ -280,7 +280,7 @@ CGL2Renderer_impl::TryStartupGL( PxU32 uiScreenW, PxU32 uiScreenH )
 		pFBScreenPong->Attach( GL2FramebufferAttachment( GL_COLOR_ATTACHMENT0, GL_TEXTURE_RECTANGLE_ARB, GL2_TEXTYPE_2D, pRBScreenColorPong ) );
 
 		// depth channel.
-		pRBScreenDepth = GL2Texture2D::CreateTexture2D( GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, uiScreenW, uiScreenH, true );
+		//pRBScreenDepth = GL2Texture2D::CreateTexture2D( GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, uiScreenW, uiScreenH, true );
 		pFBScreenPong->Attach( GL2FramebufferAttachment( GL_DEPTH_ATTACHMENT,  GL_TEXTURE_RECTANGLE_ARB, GL2_TEXTYPE_2D, pRBScreenDepth ) );
 		pFBScreenPong->Attach( GL2FramebufferAttachment( GL_STENCIL_ATTACHMENT,  GL_TEXTURE_RECTANGLE_ARB, GL2_TEXTYPE_2D, pRBScreenDepth ) );
 		//pRBScreenDepth = GL2Renderbuffer::CreateRenderbuffer( GL_DEPTH24_STENCIL8, uiScreenW, uiScreenH );
@@ -426,9 +426,10 @@ CGL2Renderer_impl::OnRedraw()
 
 #if 0
 	// render to screen, sourcing from that texture.
-	if ( GL2Shader* pShader = m.SetupShader( "blur_13taps", VIEW_SCREENSPACE ) )
+	if ( GL2Shader* pShader = m.SetupShader( "test", VIEW_SCREENSPACE ) )
 	{
 		GL2Texture2D::Bind( GL2_TEX_CURRENT, g_pRenderer->pRBScreenColorPing );
+		GL2Texture2D::Bind( GL2_TEX_DEPTH, g_pRenderer->pRBScreenDepth, true );
 
 		m.pRBScreenColorPing->DrawFullscreen();
 	}

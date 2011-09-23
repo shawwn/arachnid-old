@@ -344,6 +344,7 @@ GL2Shader_impl::InitParams()
 	InitEngineSampler( program,	GL_SAMPLER_2D,	GL2_TEX_DIFFUSE,	GL2_TEX_DIFFUSE_NAME );
 	InitEngineSampler( program,	GL_SAMPLER_2D,	GL2_TEX_NORMAL,		GL2_TEX_NORMAL_NAME );
 	InitEngineSampler( program,	GL_SAMPLER_2D,	GL2_TEX_CURRENT,	GL2_TEX_CURRENT_NAME );
+	InitEngineSampler( program,	GL_SAMPLER_2D,	GL2_TEX_DEPTH,		GL2_TEX_DEPTH_NAME );
 }
 
 //===========================================================================

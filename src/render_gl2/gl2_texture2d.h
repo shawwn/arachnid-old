@@ -27,7 +27,8 @@ public:
 											string sFileExt = ".*" );
 	static GL2Texture2D*	CreateTexture2D( GLenum glInternalFormat, GLenum glFormat, GLenum glType,
 											PxU32 uiWidth, PxU32 uiHeight, bool bIsRectangle = false );
-	static void				Bind( PxU32 uiTexUnit, GL2TextureBase* pTex2D );
+
+	static void				Bind( PxU32 uiTexUnit, GL2TextureBase* pTex2D, bool bIsDepth = false );
 	static void				Unbind( PxU32 uiTexUnit );
 
 	virtual PxU32			GetGLTarget()				{ return m_bRectangleTexture ? GL_TEXTURE_RECTANGLE_ARB : GL_TEXTURE_2D;	}
