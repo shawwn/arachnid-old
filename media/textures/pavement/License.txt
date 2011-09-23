@@ -1,0 +1,2 @@
+pavement.png originates from the "GPU Gems 3" DVD, chapter 2: "Skinned Instancing".
+
